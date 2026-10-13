@@ -1,0 +1,26 @@
+{
+  "name": "@golf/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.3",
+    "typescript": "~6.0.2"
+  },
+  "dependencies": {
+    "@colyseus/schema": "^5.0.39",
+    "@golf/shared": "workspace:*",
+    "colyseus": "^0.18.9",
+    "zod": "^4.6.6"
+  }
+}

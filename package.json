@@ -1,16 +1,17 @@
 {
   "name": "Six Card Golf",
   "private": true,
-  "main": "index.js",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
-  "license": "ISC",
+  "license": "MIT",
+  "engines": { "node": "^22.22.2 || ^24.15.0 || >=26" },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -23,12 +24,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.0",
-    "eslint": "^10.12.0",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
     "prettier": "^3.9.10",
     "typescript": "~6.0.2",
-    "typescript-eslint": "^8.71.1",
+    "typescript-eslint": "^8.69.0",
     "vitest": "^5.0.3",
-    "globals": "^17.12.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.6"
   }

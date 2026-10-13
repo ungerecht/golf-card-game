@@ -1,22 +1,39 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules', 'playwright-report']),
+  globalIgnores([
+    "**/dist",
+    "**/node_modules",
+    "playwright-report",
+    "test-results",
+  ]),
+
+  // Every TypeScript file in every package
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
+    files: ["**/*.{ts,tsx}"],
+    extends: [js.configs.recommended, tseslint.configs.recommended],
+  },
+
+  // React app only
+  {
+    files: ["packages/client/**/*.{ts,tsx}"],
+    extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
+    languageOptions: { globals: globals.browser },
+  },
+
+  // Code that runs in Node
+  {
+    files: [
+      "packages/server/**/*.ts",
+      "packages/client/vite.config.ts",
+      "e2e/**/*.ts",
+      "playwright.config.ts",
     ],
-    languageOptions: {
-      globals: globals.browser,
-    },
+    languageOptions: { globals: globals.node },
   },
 ]);

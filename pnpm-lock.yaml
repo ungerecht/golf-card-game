@@ -1,8 +1,7 @@
 ---
-lockfileVersion: '9.0'
+lockfileVersion: "9.0"
 
 importers:
-
   .:
     configDependencies: {}
     packageManagerDependencies:
@@ -11,149 +10,192 @@ importers:
         version: 12.11.2
 
 packages:
-
-  '@pnpm/exe.android-arm64@12.11.2':
-    resolution: {integrity: sha512-owLw13OfPkEoY+hLBNeeG+dCFhywr7q2d/EHPz4mNL2RhKnv8gNwMARkjkiDQu234aItVwFNDeGnmQXm+ikkAg==}
+  "@pnpm/exe.android-arm64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-owLw13OfPkEoY+hLBNeeG+dCFhywr7q2d/EHPz4mNL2RhKnv8gNwMARkjkiDQu234aItVwFNDeGnmQXm+ikkAg==,
+      }
     cpu: [arm64]
     os: [android]
 
-  '@pnpm/exe.android-x64@12.11.2':
-    resolution: {integrity: sha512-GYPkVebl4iokOA/4MPSpGoUVfFlsth7uqOCe1XiaiM23LAdvUOMJBObqHJijr89ZqjwHm9pO6vO45GRwJ2U2qA==}
+  "@pnpm/exe.android-x64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-GYPkVebl4iokOA/4MPSpGoUVfFlsth7uqOCe1XiaiM23LAdvUOMJBObqHJijr89ZqjwHm9pO6vO45GRwJ2U2qA==,
+      }
     cpu: [x64]
     os: [android]
 
-  '@pnpm/exe.darwin-arm64@12.11.2':
-    resolution: {integrity: sha512-n9M4On66y8FDxUAKgMO1FXt0qihyG4e+56p3/F0uo8Bx9KplW8BwKVnXigzCJ8aNM6sVVPkOE6M9XXbeVIxnZA==}
+  "@pnpm/exe.darwin-arm64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-n9M4On66y8FDxUAKgMO1FXt0qihyG4e+56p3/F0uo8Bx9KplW8BwKVnXigzCJ8aNM6sVVPkOE6M9XXbeVIxnZA==,
+      }
     cpu: [arm64]
     os: [darwin]
 
-  '@pnpm/exe.darwin-x64@12.11.2':
-    resolution: {integrity: sha512-oSW7n3sBT0c0cyk4kj10T2Y6Mpm+OFEiCAWozgX039tdoI6yqJF1uaFD3sw7ugLdu6VV3+uY0pa1TUZIPdxDWA==}
+  "@pnpm/exe.darwin-x64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-oSW7n3sBT0c0cyk4kj10T2Y6Mpm+OFEiCAWozgX039tdoI6yqJF1uaFD3sw7ugLdu6VV3+uY0pa1TUZIPdxDWA==,
+      }
     cpu: [x64]
     os: [darwin]
 
-  '@pnpm/exe.freebsd-x64@12.11.2':
-    resolution: {integrity: sha512-qbzc3KoDpa/Lkf8vs3jnDe6dUUbso+6eLIyssYFMiliLpYNxn8dirk11YoNnOQcdHVB50v5RFls1Yid6ttT5pg==}
+  "@pnpm/exe.freebsd-x64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-qbzc3KoDpa/Lkf8vs3jnDe6dUUbso+6eLIyssYFMiliLpYNxn8dirk11YoNnOQcdHVB50v5RFls1Yid6ttT5pg==,
+      }
     cpu: [x64]
     os: [freebsd]
 
-  '@pnpm/exe.linux-arm64-musl@12.11.2':
-    resolution: {integrity: sha512-uMEYDwKRktGwANubQ+kYCwmhNwg3Ik6qK89ahsbQ5cP30R/5FVJb/T99vr9XRUBC/A7mZI6eeT92oyVas9ACyg==}
+  "@pnpm/exe.linux-arm64-musl@12.11.2":
+    resolution:
+      {
+        integrity: sha512-uMEYDwKRktGwANubQ+kYCwmhNwg3Ik6qK89ahsbQ5cP30R/5FVJb/T99vr9XRUBC/A7mZI6eeT92oyVas9ACyg==,
+      }
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/exe.linux-arm64@12.11.2':
-    resolution: {integrity: sha512-6e8ZAQUwFXAWHHHv5FesWqf/kEK04wuitBv5f/gxzkC0DiBfaixr+f+6JQede8SF4Ji5LcMwVFJbzAtffpWxEg==}
+  "@pnpm/exe.linux-arm64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-6e8ZAQUwFXAWHHHv5FesWqf/kEK04wuitBv5f/gxzkC0DiBfaixr+f+6JQede8SF4Ji5LcMwVFJbzAtffpWxEg==,
+      }
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-ppc64@12.11.2':
-    resolution: {integrity: sha512-Ui8A4nepkVupx2VpuFfysEluMvWK6gTB5rgVts7Ss/+8dj0RD28x3F/seNeH/zSypgC6yKdV6qsKVQh/uffTuQ==}
+  "@pnpm/exe.linux-ppc64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-Ui8A4nepkVupx2VpuFfysEluMvWK6gTB5rgVts7Ss/+8dj0RD28x3F/seNeH/zSypgC6yKdV6qsKVQh/uffTuQ==,
+      }
     cpu: [ppc64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-riscv64@12.11.2':
-    resolution: {integrity: sha512-i1yLdQ5bu+wjQ+srtFoJAaY2gN/+oXHFdjul4llCeoDxHE0rTIG3R41NhHfCjyFPW4+CpbBT58933CL9sMOCnA==}
+  "@pnpm/exe.linux-riscv64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-i1yLdQ5bu+wjQ+srtFoJAaY2gN/+oXHFdjul4llCeoDxHE0rTIG3R41NhHfCjyFPW4+CpbBT58933CL9sMOCnA==,
+      }
     cpu: [riscv64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-s390x@12.11.2':
-    resolution: {integrity: sha512-YS1/lhPjjTsN4QL50VaFZKRa3Uc/bDnhE8eKbJMFvuX06UuFS5YaiDg04APoZdfVSGqTfX27QAg7rfLMSWaqxA==}
+  "@pnpm/exe.linux-s390x@12.11.2":
+    resolution:
+      {
+        integrity: sha512-YS1/lhPjjTsN4QL50VaFZKRa3Uc/bDnhE8eKbJMFvuX06UuFS5YaiDg04APoZdfVSGqTfX27QAg7rfLMSWaqxA==,
+      }
     cpu: [s390x]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-x64-musl@12.11.2':
-    resolution: {integrity: sha512-7eIxQR05fvJxCujUSKp5KTtehJ7QqrgqP/HD1+BcB/SaV2Be4XI1PEHiOgA1zxsiMIeMvTF6E4G4dYHrFjeXRg==}
+  "@pnpm/exe.linux-x64-musl@12.11.2":
+    resolution:
+      {
+        integrity: sha512-7eIxQR05fvJxCujUSKp5KTtehJ7QqrgqP/HD1+BcB/SaV2Be4XI1PEHiOgA1zxsiMIeMvTF6E4G4dYHrFjeXRg==,
+      }
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/exe.linux-x64@12.11.2':
-    resolution: {integrity: sha512-FK7QKe24AYgppJwO3mpooYptduuvIGqKJPi5ac7MdnWkjUy46JBfYhCW0grnkWKC8YOf0x+vGviuQqJEj3SpQQ==}
+  "@pnpm/exe.linux-x64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-FK7QKe24AYgppJwO3mpooYptduuvIGqKJPi5ac7MdnWkjUy46JBfYhCW0grnkWKC8YOf0x+vGviuQqJEj3SpQQ==,
+      }
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.win32-arm64@12.11.2':
-    resolution: {integrity: sha512-PCTjVDdJb6VvraZxrEeFv6EqEA0hhIsAySx28e95J2Tqpi88hLpgOXgNqV0vpxq9A+b8GLQfyk/D+1UlJPv/YQ==}
+  "@pnpm/exe.win32-arm64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-PCTjVDdJb6VvraZxrEeFv6EqEA0hhIsAySx28e95J2Tqpi88hLpgOXgNqV0vpxq9A+b8GLQfyk/D+1UlJPv/YQ==,
+      }
     cpu: [arm64]
     os: [win32]
 
-  '@pnpm/exe.win32-x64@12.11.2':
-    resolution: {integrity: sha512-8sgX86OvRjJ3yZs/TvGR2L31wH9ScPZ+f+geKI3ikuB0RRiK3i4LlTRO8OXN6pdRqj8epMde4312MCjj7JsJdA==}
+  "@pnpm/exe.win32-x64@12.11.2":
+    resolution:
+      {
+        integrity: sha512-8sgX86OvRjJ3yZs/TvGR2L31wH9ScPZ+f+geKI3ikuB0RRiK3i4LlTRO8OXN6pdRqj8epMde4312MCjj7JsJdA==,
+      }
     cpu: [x64]
     os: [win32]
 
   pnpm@12.11.2:
-    resolution: {integrity: sha512-JaUWUqGWeFr18ovabf6NxYLr76SsHRgCIc4TkCMcX7dmN4IupLbkYzznSs3LCnf3Ja8RutOBd/3t2u6BipVcuQ==}
-    engines: {node: '>=18.*'}
+    resolution:
+      {
+        integrity: sha512-JaUWUqGWeFr18ovabf6NxYLr76SsHRgCIc4TkCMcX7dmN4IupLbkYzznSs3LCnf3Ja8RutOBd/3t2u6BipVcuQ==,
+      }
+    engines: { node: ">=18.*" }
     hasBin: true
 
 snapshots:
-
-  '@pnpm/exe.android-arm64@12.11.2':
+  "@pnpm/exe.android-arm64@12.11.2":
     optional: true
 
-  '@pnpm/exe.android-x64@12.11.2':
+  "@pnpm/exe.android-x64@12.11.2":
     optional: true
 
-  '@pnpm/exe.darwin-arm64@12.11.2':
+  "@pnpm/exe.darwin-arm64@12.11.2":
     optional: true
 
-  '@pnpm/exe.darwin-x64@12.11.2':
+  "@pnpm/exe.darwin-x64@12.11.2":
     optional: true
 
-  '@pnpm/exe.freebsd-x64@12.11.2':
+  "@pnpm/exe.freebsd-x64@12.11.2":
     optional: true
 
-  '@pnpm/exe.linux-arm64-musl@12.11.2':
+  "@pnpm/exe.linux-arm64-musl@12.11.2":
     optional: true
 
-  '@pnpm/exe.linux-arm64@12.11.2':
+  "@pnpm/exe.linux-arm64@12.11.2":
     optional: true
 
-  '@pnpm/exe.linux-ppc64@12.11.2':
+  "@pnpm/exe.linux-ppc64@12.11.2":
     optional: true
 
-  '@pnpm/exe.linux-riscv64@12.11.2':
+  "@pnpm/exe.linux-riscv64@12.11.2":
     optional: true
 
-  '@pnpm/exe.linux-s390x@12.11.2':
+  "@pnpm/exe.linux-s390x@12.11.2":
     optional: true
 
-  '@pnpm/exe.linux-x64-musl@12.11.2':
+  "@pnpm/exe.linux-x64-musl@12.11.2":
     optional: true
 
-  '@pnpm/exe.linux-x64@12.11.2':
+  "@pnpm/exe.linux-x64@12.11.2":
     optional: true
 
-  '@pnpm/exe.win32-arm64@12.11.2':
+  "@pnpm/exe.win32-arm64@12.11.2":
     optional: true
 
-  '@pnpm/exe.win32-x64@12.11.2':
+  "@pnpm/exe.win32-x64@12.11.2":
     optional: true
 
   pnpm@12.11.2:
     optionalDependencies:
-      '@pnpm/exe.android-arm64': 12.11.2
-      '@pnpm/exe.android-x64': 12.11.2
-      '@pnpm/exe.darwin-arm64': 12.11.2
-      '@pnpm/exe.darwin-x64': 12.11.2
-      '@pnpm/exe.freebsd-x64': 12.11.2
-      '@pnpm/exe.linux-arm64': 12.11.2
-      '@pnpm/exe.linux-arm64-musl': 12.11.2
-      '@pnpm/exe.linux-ppc64': 12.11.2
-      '@pnpm/exe.linux-riscv64': 12.11.2
-      '@pnpm/exe.linux-s390x': 12.11.2
-      '@pnpm/exe.linux-x64': 12.11.2
-      '@pnpm/exe.linux-x64-musl': 12.11.2
-      '@pnpm/exe.win32-arm64': 12.11.2
-      '@pnpm/exe.win32-x64': 12.11.2
+      "@pnpm/exe.android-arm64": 12.11.2
+      "@pnpm/exe.android-x64": 12.11.2
+      "@pnpm/exe.darwin-arm64": 12.11.2
+      "@pnpm/exe.darwin-x64": 12.11.2
+      "@pnpm/exe.freebsd-x64": 12.11.2
+      "@pnpm/exe.linux-arm64": 12.11.2
+      "@pnpm/exe.linux-arm64-musl": 12.11.2
+      "@pnpm/exe.linux-ppc64": 12.11.2
+      "@pnpm/exe.linux-riscv64": 12.11.2
+      "@pnpm/exe.linux-s390x": 12.11.2
+      "@pnpm/exe.linux-x64": 12.11.2
+      "@pnpm/exe.linux-x64-musl": 12.11.2
+      "@pnpm/exe.win32-arm64": 12.11.2
+      "@pnpm/exe.win32-x64": 12.11.2
 
 ---
 lockfileVersion: '9.0'
@@ -161,6 +203,8 @@ lockfileVersion: '9.0'
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
+
+packageExtensionsChecksum: sha256-CRVg6XH/7z0hMR3p36ZcM+9XtGuJ2+SX1rN0gVTUYhk=
 
 importers:
 
@@ -172,6 +216,9 @@ importers:
       '@playwright/test':
         specifier: ^1.64.0
         version: 1.64.0
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
       eslint:
         specifier: ^10.10.0
         version: 10.12.0
@@ -218,9 +265,9 @@ importers:
         specifier: ^5.0.15
         version: 5.0.15(@types/react@19.3.0)(react@19.3.0)
     devDependencies:
-      '@eslint/js':
-        specifier: ^10.0.1
-        version: 10.0.1(eslint@10.12.0)
+      '@testing-library/dom':
+        specifier: 10.4.2
+        version: 10.4.2
       '@testing-library/react':
         specifier: ^16.3.3
         version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -236,9 +283,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^6.1.1
         version: 6.1.2(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15))
-      globals:
-        specifier: ^17.12.0
-        version: 17.13.0
       jsdom:
         specifier: ^30.1.2
         version: 30.1.2
@@ -262,7 +306,7 @@ importers:
         version: link:../shared
       colyseus:
         specifier: ^0.18.9
-        version: 0.18.9(@colyseus/auth@0.18.4)(@colyseus/core@0.18.18)(@colyseus/redis-driver@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/redis-presence@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/uwebsockets-transport@0.18.4(@colyseus/core@0.18.18))(@colyseus/ws-transport@0.18.4)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15))(zod@4.6.6)
+        version: 0.18.9(@colyseus/auth@0.18.4)(@colyseus/core@0.18.18)(@colyseus/redis-driver@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/redis-presence@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15))(zod@4.6.6)
       zod:
         specifier: ^4.6.6
         version: 4.6.6
@@ -489,16 +533,6 @@ packages:
     peerDependencies:
       '@colyseus/core': 0.18.x
       '@colyseus/ws-transport': 0.18.x
-
-  '@colyseus/uwebsockets-transport@0.18.4':
-    resolution: {integrity: sha512-Saqn3XrobCUI9shLEkcK0QnT3ETHwXW+K2s0/z0iiSbYMylPsCvWI+6dGcasVm4LajjXHYDpVadfFQM7Jplllg==}
-    engines: {node: '>= 22.x'}
-    peerDependencies:
-      '@colyseus/core': ^0.18.5
-      uwebsockets-express: ^1.4.1 || ^2.0.1
-    peerDependenciesMeta:
-      uwebsockets-express:
-        optional: true
 
   '@colyseus/ws-transport@0.18.4':
     resolution: {integrity: sha512-gSPEkhV9cX8QjJWJiXfkRF38ZIiWq7DbDvzkgGqa1zmdOSZBP1aaM9tnZyvcjc1OpG+AFggeehrs/QMDBEzz2g==}
@@ -1196,6 +1230,8 @@ packages:
       '@colyseus/ws-transport': 0.18.x
       vite: '>=6.0.0'
     peerDependenciesMeta:
+      '@colyseus/uwebsockets-transport':
+        optional: true
       vite:
         optional: true
 
@@ -2196,10 +2232,6 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  uWebSockets.js@https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/cfc9a40d8132a34881813cec3d5f8e3a185b3ce3:
-    resolution: {gitHosted: true, integrity: sha512-1eSUhK/WLig+fbq6dB18hsmkoaC+6YGVkAp2r0tQ6PGBxsOPpLUmMsKN/7ANoYtWiou+lU46+Bnf8JBYES9EsA==, tarball: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/cfc9a40d8132a34881813cec3d5f8e3a185b3ce3}
-    version: 20.52.0
-
   uid-safe@2.1.5:
     resolution: {integrity: sha512-KPHm4VL5dDXKz01UuEd88Df+KzynaohSL9fBh096KWAxSKZQDI2uBrVqtvRM4rwrIrRRKsdLNML/lnaaVSRioA==}
     engines: {node: '>= 0.8'}
@@ -2672,11 +2704,6 @@ snapshots:
       dotenv: 18.0.7
     transitivePeerDependencies:
       - supports-color
-
-  '@colyseus/uwebsockets-transport@0.18.4(@colyseus/core@0.18.18)':
-    dependencies:
-      '@colyseus/core': 0.18.18(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6)
-      uWebSockets.js: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/cfc9a40d8132a34881813cec3d5f8e3a185b3ce3
 
   '@colyseus/ws-transport@0.18.4(@colyseus/core@0.18.18)(express@5.3.0)':
     dependencies:
@@ -3231,7 +3258,7 @@ snapshots:
 
   cluster-key-slot@1.1.1: {}
 
-  colyseus@0.18.9(@colyseus/auth@0.18.4)(@colyseus/core@0.18.18)(@colyseus/redis-driver@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/redis-presence@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/uwebsockets-transport@0.18.4(@colyseus/core@0.18.18))(@colyseus/ws-transport@0.18.4)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15))(zod@4.6.6):
+  colyseus@0.18.9(@colyseus/auth@0.18.4)(@colyseus/core@0.18.18)(@colyseus/redis-driver@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/redis-presence@0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15))(zod@4.6.6):
     dependencies:
       '@colyseus/auth': 0.18.4(@colyseus/core@0.18.18)(express@5.3.0)(zod@4.6.6)
       '@colyseus/core': 0.18.18(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6)
@@ -3241,7 +3268,6 @@ snapshots:
       '@colyseus/redis-presence': 0.18.5(@colyseus/auth@0.18.4)(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.39(typescript@6.0.3))(@colyseus/ws-transport@0.18.4)(@pm2/io@6.1.0)(express@5.3.0)(zod@4.6.6)
       '@colyseus/schema': 5.0.39(typescript@6.0.3)
       '@colyseus/tools': 0.18.9(@colyseus/core@0.18.18)(@colyseus/ws-transport@0.18.4)
-      '@colyseus/uwebsockets-transport': 0.18.4(@colyseus/core@0.18.18)
       '@colyseus/ws-transport': 0.18.4(@colyseus/core@0.18.18)(express@5.3.0)
     optionalDependencies:
       vite: 8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15)
@@ -4079,7 +4105,7 @@ snapshots:
 
   require-in-the-middle@5.2.0:
     dependencies:
-      debug: 4.4.3
+      debug: 4.3.7
       module-details-from-path: 1.0.4
       resolve: 1.22.13
     transitivePeerDependencies:
@@ -4281,8 +4307,6 @@ snapshots:
       - supports-color
 
   typescript@6.0.3: {}
-
-  uWebSockets.js@https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/cfc9a40d8132a34881813cec3d5f8e3a185b3ce3: {}
 
   uid-safe@2.1.5:
     dependencies:

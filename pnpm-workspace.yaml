@@ -3,4 +3,8 @@ packages:
 allowBuilds:
   esbuild: false
   msgpackr-extract: false
-blockExoticSubdeps: false
+packageExtensions:
+  colyseus:
+    peerDependenciesMeta:
+      "@colyseus/uwebsockets-transport":
+        optional: true

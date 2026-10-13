@@ -1,0 +1,21 @@
+{
+  "name": "@golf/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15"
+  },
+  "dependencies": {
+    "@colyseus/schema": "^5.0.39",
+    "@golf/shared": "workspace:*",
+    "colyseus": "^0.18.9",
+    "zod": "^4.6.6"
+  }
+}

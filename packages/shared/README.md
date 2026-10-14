@@ -17,9 +17,11 @@ When two matching cards are in the same column their values cancel out to 0.
 
 ### Gameplay
 <ins>SETUP</ins>  
-The cards are shuffled and dealt face down one at a time until every player has six cards forming their grid - two rows of three columns.
+The cards are shuffled and dealt face down one at a time until every player has six cards forming their grid.
 The cards are dealt starting with the player to the left of the dealer.
 The dealer for the first hole is the room host, for every other round the dealer is "The Biggest Loser" from the previous round.
+
+The rest of the deck is placed in the middle of the table, and the top card is flipped up starting the discard pile.
 
 <ins>INITIAL FLIP</ins>  
 Before the game begins each player gets to flip two cards.

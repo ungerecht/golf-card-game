@@ -5,14 +5,12 @@ import {
   getWinnerIds,
   scoreGrid,
   scoreHole,
+  showingScore,
   totalScore,
 } from "./scoring";
-import {
-  DEFAULT_SETTINGS,
-  GameSettingsSchema,
-  type GameSettings,
-} from "./settings";
+import { GameSettingsSchema } from "./settings";
 import type { Grid, PlayerState, Tuple6 } from "./state";
+import { makeGrid } from "./test-helpers";
 
 function card(rank: Rank, index: number): Card {
   const id = `test-${index}`;
@@ -34,10 +32,6 @@ function player(
   holeScores: number[] = [],
 ): PlayerState {
   return { id, grid: grid(ranks), holeScores };
-}
-
-function settings(overrides: Partial<GameSettings> = {}): GameSettings {
-  return { ...DEFAULT_SETTINGS, ...overrides };
 }
 
 describe("cardValue", () => {
@@ -138,6 +132,35 @@ describe("GameSettingsSchema", () => {
     expect(GameSettingsSchema.safeParse({ holes: 0 }).success).toBe(false);
     expect(GameSettingsSchema.safeParse({ holes: 19 }).success).toBe(false);
     expect(GameSettingsSchema.safeParse({ maxPlayers: 1 }).success).toBe(false);
-    expect(GameSettingsSchema.safeParse({ maxPlayers: 7 }).success).toBe(false);
+    expect(GameSettingsSchema.safeParse({ maxPlayers: 5 }).success).toBe(false);
+  });
+
+  it("only accepts 3, 6 or 9 holes", () => {
+    for (const holes of [4, 5, 7, 8]) {
+      expect(GameSettingsSchema.safeParse({ holes }).success).toBe(false);
+    }
+    for (const holes of [3, 6, 9]) {
+      expect(GameSettingsSchema.safeParse({ holes }).success).toBe(true);
+    }
+  });
+});
+
+describe("showingScore", () => {
+  it("counts face-up cards only", () => {
+    expect(showingScore(makeGrid(["2", "3", "9", "9", "9", "9"], [0, 1]))).toBe(
+      5,
+    );
+    expect(showingScore(makeGrid(["2", "3", "9", "9", "9", "9"]))).toBe(0);
+  });
+
+  it("cancels a column only when both cards are face up", () => {
+    const ranks = ["7", "2", "3", "7", "4", "5"] as const;
+    expect(showingScore(makeGrid(ranks, [0, 3]))).toBe(0);
+    expect(showingScore(makeGrid(ranks, [0]))).toBe(7);
+  });
+
+  it("equals the full score when everything is face up", () => {
+    const ranks = ["A", "2", "5", "3", "4", "6"] as const;
+    expect(showingScore(makeGrid(ranks, [0, 1, 2, 3, 4, 5]))).toBe(21);
   });
 });

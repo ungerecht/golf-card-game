@@ -12,7 +12,7 @@ const SlotSchema = z.literal(SLOT_INDEXES);
  * before touching game state.
  */
 export const ActionSchema = z.discriminatedUnion("type", [
-  /** Phase "initialFlip": turn two of your cards face up. */
+  /** Phase "initialFlip": turn one more of your cards face up. Everyone flips until they have the number the round asks for (two to start with). */
   z.object({ type: z.literal("flipInitial"), slot: SlotSchema }),
   /** Phase "flipOrDraw": turn a face-down card face up */
   z.object({ type: z.literal("flip"), slot: SlotSchema }),

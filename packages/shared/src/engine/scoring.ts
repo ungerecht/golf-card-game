@@ -1,5 +1,4 @@
 import type { Card } from "./cards";
-import type { GameSettings } from "./settings";
 import {
   GRID_COLUMNS,
   type Grid,
@@ -23,17 +22,35 @@ export function cardValue(card: Card): number {
   }
 }
 
+// Two cards of the same rank in a column cancel out to 0, whatever their suits.
+function columnScore(upper: Card, lower: Card): number {
+  return upper.rank === lower.rank ? 0 : cardValue(upper) + cardValue(lower);
+}
+
 // Score of one grid.
 // Counts every card, face up or not, so call it once the hole is over.
 export function scoreGrid(grid: Grid): number {
   let total = 0;
   for (const [top, bottom] of GRID_COLUMNS) {
-    const upper = grid[top].card;
-    const lower = grid[bottom].card;
-    if (upper.rank === lower.rank) {
-      continue;
+    total += columnScore(grid[top].card, grid[bottom].card);
+  }
+  return total;
+}
+
+// Score of the face-up cards only. Used to decide who goes first.
+// A column only counts as a match when both of its cards are face up.
+export function showingScore(grid: Grid): number {
+  let total = 0;
+  for (const [top, bottom] of GRID_COLUMNS) {
+    const upper = grid[top];
+    const lower = grid[bottom];
+    if (upper.faceUp && lower.faceUp) {
+      total += columnScore(upper.card, lower.card);
+    } else if (upper.faceUp) {
+      total += cardValue(upper.card);
+    } else if (lower.faceUp) {
+      total += cardValue(lower.card);
     }
-    total += cardValue(upper) + cardValue(lower);
   }
   return total;
 }

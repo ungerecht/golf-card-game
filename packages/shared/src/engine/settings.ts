@@ -10,10 +10,10 @@ import { z } from "zod";
 export const GameSettingsSchema = z.object({
   // Room privacy
   private: z.boolean().default(true),
-  // Max players: 2-4
-  maxPlayers: z.number().int().min(2).max(4).default(4),
-  // Number of holes (rounds) in a game. 3, 6, or 9
-  holes: z.number().int().min(3).max(9).default(9),
+  // Max players: 2, 3, or 4
+  maxPlayers: z.literal([2, 3, 4]).default(4),
+  // Number of holes (rounds) in a game: 3, 6, or 9
+  holes: z.literal([3, 6, 9]).default(9),
   // Fill empty player slots with bots
   bots: z.boolean().default(false),
 });

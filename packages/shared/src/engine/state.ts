@@ -46,8 +46,14 @@ export type DrawSource = "deck" | "discard";
  * the compiler checks that the reducer handles all of them.
  */
 export type Phase =
-  // Every player flips INITIAL_FLIPS cards, in any order.
-  | { readonly type: "initialFlip" }
+  // Every player flips cards until they each have `flipsRequired` face up, in any order.
+  // Whoever shows the lowest score among `contenders` goes first. On a tie,
+  // everyone flips one more card and only the tied players stay contenders.
+  | {
+      readonly type: "initialFlip";
+      readonly flipsRequired: number;
+      readonly contenders: readonly PlayerId[];
+    }
   // The current player can flip a face-down card or draw from the deck or the discard pile.
   | { readonly type: "flipOrDraw" }
   // The current player holds `drawn` and must swap it into their grid. A card drawn from the deck may also be discarded instead.
@@ -62,6 +68,8 @@ export type Phase =
 
 export interface GameState {
   readonly settings: GameSettings;
+  // Players in seating order. Turns and the deal pass to the left (clockwise),
+  // which means towards higher indexes, wrapping around at the end.
   readonly players: readonly PlayerState[];
   // Draw pile. The next card drawn is the last element.
   readonly deck: readonly Card[];
@@ -69,6 +77,10 @@ export interface GameState {
   readonly discard: readonly Card[];
   // Current hole, starting at 1.
   readonly hole: number;
+  // Index into `players` of the dealer. Cards are dealt starting with the
+  // player to the dealer's left. The host deals the first hole, and the deal
+  // passes one seat to the left after every hole.
+  readonly dealerIndex: number;
   // Index into `players` of whose turn it is.
   readonly currentPlayerIndex: number;
   readonly phase: Phase;

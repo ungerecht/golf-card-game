@@ -23,7 +23,7 @@ export function cardValue(card: Card): number {
 }
 
 // Two cards of the same rank in a column cancel out to 0, whatever their suits.
-function columnScore(upper: Card, lower: Card): number {
+export function columnScore(upper: Card, lower: Card): number {
   return upper.rank === lower.rank ? 0 : cardValue(upper) + cardValue(lower);
 }
 

@@ -16,6 +16,8 @@ export const GameSettingsSchema = z.object({
   holes: z.literal([3, 6, 9]).default(9),
   // Fill empty player slots with bots
   bots: z.boolean().default(false),
+  // How well bots play: "easy" or "normal". Only matters when bots are on.
+  botDifficulty: z.literal(["easy", "normal"]).default("normal"),
 });
 
 export type GameSettings = z.infer<typeof GameSettingsSchema>;

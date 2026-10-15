@@ -10,3 +10,4 @@ export * from "./engine/scoring";
 export * from "./engine/settings";
 export * from "./engine/setup";
 export * from "./engine/state";
+export * from "./engine/views";

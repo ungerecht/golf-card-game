@@ -125,7 +125,17 @@ describe("GameSettingsSchema", () => {
       maxPlayers: 4,
       holes: 9,
       bots: false,
+      botDifficulty: "normal",
     });
+  });
+
+  it("only accepts easy or normal bot difficulty", () => {
+    expect(
+      GameSettingsSchema.parse({ botDifficulty: "easy" }).botDifficulty,
+    ).toBe("easy");
+    expect(
+      GameSettingsSchema.safeParse({ botDifficulty: "hard" }).success,
+    ).toBe(false);
   });
 
   it("rejects out-of-range values", () => {

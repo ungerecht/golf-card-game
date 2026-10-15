@@ -116,3 +116,4 @@ The host chooses these before the lobby code is generated.
 | Max players | `2`, `3`, `4`           | `4`     | How many players can join the lobby.                                |
 | Holes       | `3`, `6`, `9`           | `9`     | Number of rounds in a game.                                         |
 | Bots        | `true`, `false`         | `false` | Whether empty player slots are filled with bots, up to Max players. |
+| Bot difficulty | `easy`, `normal`     | `normal` | How well bots play. Easy bots choose any legal move at random. Normal bots take low cards and avoid bad swaps. Only used when Bots is on. |

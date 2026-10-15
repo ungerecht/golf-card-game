@@ -4,10 +4,12 @@ import type { Action } from "./actions";
 import type { Card } from "./cards";
 import type { Rng } from "./rng";
 import { cardValue, columnScore } from "./scoring";
+import type { GameSettings } from "./settings";
 import { GRID_COLUMNS, SLOT_INDEXES, type SlotIndex } from "./state";
 import type { GameView } from "./views";
 
-export type BotLevel = "easy" | "normal";
+/** Matches the host's `botDifficulty` setting. */
+export type BotLevel = GameSettings["botDifficulty"];
 
 /**
  * A face-down card is worth this much on average: the mean of A to Q (1 to 12)

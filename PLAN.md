@@ -35,7 +35,7 @@ Use TypeScript end to end: React with Vite on the client, Node.js with Colyseus 
 
 - Vitest for unit tests (especially the game engine) and Playwright for a multi-browser end-to-end test of a full game.
 - ESLint, Prettier and GitHub Actions for CI.
-- A permissive license such as MIT or Apache 2.0, plus a CONTRIBUTING file and a "good first issue" label to attract contributors.
+- A CONTRIBUTING file and a "good first issue" label to attract contributors.
 
 ### Hosting and persistence
 

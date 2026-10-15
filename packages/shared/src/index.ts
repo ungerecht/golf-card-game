@@ -12,3 +12,5 @@ export * from "./engine/settings";
 export * from "./engine/setup";
 export * from "./engine/state";
 export * from "./engine/views";
+export * from "./protocol";
+export * from "./results";

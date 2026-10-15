@@ -269,6 +269,9 @@ importers:
         specifier: ^4.6.6
         version: 4.6.7
     devDependencies:
+      '@colyseus/sdk':
+        specifier: ^0.18.5
+        version: 0.18.5(@colyseus/core@0.18.18)(typescript@6.0.3)(zod@4.6.7)
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2

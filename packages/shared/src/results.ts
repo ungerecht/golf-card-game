@@ -21,7 +21,7 @@ export function buildGameResult(
     return {
       playerId: player.id,
       name: who?.name ?? player.id,
-      avatar: who?.avatar ?? "fox",
+      avatar: who?.avatar ?? "visor",
       isBot: who?.isBot ?? false,
       holeScores: player.holeScores,
       total,

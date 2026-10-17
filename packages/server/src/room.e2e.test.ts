@@ -83,7 +83,7 @@ afterAll(async () => {
 async function host(settings: Record<string, unknown> = {}): Promise<Player> {
   const room = await client.create(ROOM_NAME, {
     name: "Ann",
-    avatar: "fox",
+    avatar: "visor",
     settings,
   });
   const player = new Player(room);
@@ -94,7 +94,7 @@ async function host(settings: Record<string, unknown> = {}): Promise<Player> {
 async function join(
   code: string,
   name: string,
-  avatar = "owl",
+  avatar = "teal",
 ): Promise<Player> {
   const room = await client.joinById(code, { name, avatar });
   const player = new Player(room);
@@ -130,7 +130,7 @@ describe("creating and joining a room", () => {
 
   it("rejects a bad name, a bad avatar and unknown codes", async () => {
     await expect(
-      client.create(ROOM_NAME, { name: "", avatar: "fox" }),
+      client.create(ROOM_NAME, { name: "", avatar: "visor" }),
     ).rejects.toBeDefined();
     await expect(
       client.create(ROOM_NAME, { name: "Ann", avatar: "dragon" }),
@@ -138,12 +138,12 @@ describe("creating and joining a room", () => {
     await expect(
       client.create(ROOM_NAME, {
         name: "Ann",
-        avatar: "fox",
+        avatar: "visor",
         settings: { holes: 4 },
       }),
     ).rejects.toBeDefined();
     await expect(
-      client.joinById("ZZZZZ", { name: "Ben", avatar: "owl" }),
+      client.joinById("ZZZZZ", { name: "Ben", avatar: "teal" }),
     ).rejects.toBeDefined();
 
     const ann = await host();
@@ -157,7 +157,7 @@ describe("creating and joining a room", () => {
     const ann = await host({ maxPlayers: 2 });
     const ben = await join(ann.room.roomId, "Ben");
     await expect(
-      client.joinById(ann.room.roomId, { name: "Cy", avatar: "cat" }),
+      client.joinById(ann.room.roomId, { name: "Cy", avatar: "chip" }),
     ).rejects.toBeDefined();
     await ben.room.leave();
     await ann.room.leave();
@@ -186,7 +186,7 @@ describe("playing a game", () => {
 
     // No more joiners once it has started.
     await expect(
-      client.joinById(ann.room.roomId, { name: "Cy", avatar: "cat" }),
+      client.joinById(ann.room.roomId, { name: "Cy", avatar: "chip" }),
     ).rejects.toBeDefined();
 
     ann.room.send("action", { type: "flipInitial", slot: 2 });

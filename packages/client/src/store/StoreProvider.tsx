@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { LobbyStore } from "./lobbyStore";
-import { StoreContext } from "./storeContext";
+import { StoreContext } from "./context";
 
 export function StoreProvider({
   store,

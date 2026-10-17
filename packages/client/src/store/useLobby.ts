@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useStore } from "zustand";
 import type { LobbyState } from "./lobbyStore";
-import { StoreContext } from "./storeContext";
+import { StoreContext } from "./context";
 
 /** Read part of the lobby state. Re-renders only when that part changes. */
 export function useLobby<T>(selector: (state: LobbyState) => T): T {

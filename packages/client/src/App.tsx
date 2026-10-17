@@ -7,7 +7,7 @@ import { HostSettings } from "./screens/HostSettings";
 import { Landing } from "./screens/Landing";
 import { WaitingRoom } from "./screens/WaitingRoom";
 import { createLobbyStore, type LobbyStore } from "./store/lobbyStore";
-import { StoreProvider } from "./store/StoreContext";
+import { StoreProvider } from "./store/StoreProvider";
 
 export function App({ store }: { store?: LobbyStore }) {
   usePixelScale();

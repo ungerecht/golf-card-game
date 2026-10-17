@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { buildGameResult } from "./results";
 
 const roster = [
-  { id: "a", name: "Ann", avatar: "fox", isBot: false },
-  { id: "b", name: "Ben", avatar: "owl", isBot: false },
-  { id: "c", name: "Bot 1", avatar: "cat", isBot: true },
+  { id: "a", name: "Ann", avatar: "visor", isBot: false },
+  { id: "b", name: "Ben", avatar: "teal", isBot: false },
+  { id: "c", name: "Bot 1", avatar: "chip", isBot: true },
 ] as const;
 
 const player = (id: string, holeScores: number[]) => ({ id, holeScores });
@@ -24,7 +24,7 @@ describe("buildGameResult", () => {
     );
     expect(result.scoresheet[0]).toMatchObject({
       name: "Ben",
-      avatar: "owl",
+      avatar: "teal",
       isBot: false,
       holeScores: [3, 4],
       winner: true,

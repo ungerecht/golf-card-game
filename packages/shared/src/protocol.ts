@@ -13,18 +13,12 @@ export const ROOM_NAME = "golf";
 
 /** Preset avatars. Players send the id, never an image. */
 export const AVATAR_IDS = [
-  "fox",
-  "owl",
-  "bear",
-  "frog",
-  "cat",
-  "dog",
-  "panda",
-  "penguin",
-  "rabbit",
-  "tiger",
-  "koala",
-  "otter",
+  "visor",
+  "teal",
+  "lavender",
+  "bucket",
+  "chip",
+  "ginger",
 ] as const;
 export type AvatarId = (typeof AVATAR_IDS)[number];
 

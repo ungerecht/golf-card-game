@@ -18,6 +18,7 @@ import {
   type LobbyPlayer,
   type LobbySnapshot,
   type PlayerId,
+  type RoomClosedReason,
   type RoomErrorCode,
   type Rng,
   type ServerMessages,
@@ -48,6 +49,10 @@ export interface SessionOptions {
   readonly nextHoleDelayMs?: number;
   /** Called when a bot takes over the seat of a player who did not come back. */
   readonly onTakeover?: (playerId: PlayerId) => void;
+  /** How long a connection can sit in the waiting room without pressing Ready. */
+  readonly readyTimeoutMs?: number;
+  /** Called when a connection should be dropped, for example for never readying up. */
+  readonly onKick?: (playerId: PlayerId, reason: RoomClosedReason) => void;
 }
 
 interface Seat {
@@ -64,10 +69,13 @@ interface Seat {
 export const DEFAULT_BOT_DELAY_MS = 900;
 export const DEFAULT_RECONNECT_GRACE_MS = 2 * 60 * 1000;
 export const DEFAULT_NEXT_HOLE_DELAY_MS = 30 * 1000;
+export const DEFAULT_READY_TIMEOUT_MS = 60 * 1000;
 
 export class GameSession {
   readonly #options: SessionOptions;
   readonly #seats: Seat[] = [];
+  /** Connected, but without a seat yet. Each has a clock to press Ready. */
+  readonly #pending = new Map<PlayerId, ReturnType<typeof setTimeout>>();
   #hostId: PlayerId | null = null;
   #game: GameState | null = null;
   #botTimer: ReturnType<typeof setTimeout> | null = null;
@@ -98,24 +106,57 @@ export class GameSession {
     return this.started && !this.isOver;
   }
 
+  /** The host, who may still be choosing an avatar. `null` before anyone connects. */
+  get hostId(): PlayerId | null {
+    return this.#hostId;
+  }
+
   get playerCount(): number {
     return this.#seats.length;
   }
 
-  /** Why a new player could not take a seat right now, or `null` if they can. */
+  /**
+   * Why a new connection could not come in right now, or `null` if it can.
+   * Connections that have not pressed Ready yet count towards the limit.
+   */
   joinError(): RoomErrorCode | null {
     if (this.started) return "ALREADY_STARTED";
-    if (this.#seats.length >= this.#options.settings.maxPlayers) {
+    if (
+      this.#seats.length + this.#pending.size >=
+      this.#options.settings.maxPlayers
+    ) {
       return "ROOM_FULL";
     }
     return null;
   }
 
-  /** Seat a new player. The first one to join is the host. */
-  join(id: PlayerId, name: string, avatar: AvatarId): RoomErrorCode | null {
+  /**
+   * Someone connected. They are in the waiting room but have no seat until
+   * they press Ready. The first connection is the host.
+   */
+  connect(id: PlayerId): RoomErrorCode | null {
     const error = this.joinError();
     if (error !== null) return error;
-    this.#seats.push({
+    const timeout = this.#options.readyTimeoutMs ?? DEFAULT_READY_TIMEOUT_MS;
+    this.#pending.set(
+      id,
+      setTimeout(() => this.#kick(id, "TIMED_OUT"), timeout),
+    );
+    this.#hostId ??= id;
+    this.#changed();
+    return null;
+  }
+
+  /** Claim a seat with a name and avatar. The host always takes the first one. */
+  ready(id: PlayerId, name: string, avatar: AvatarId): void {
+    if (this.started) return this.#fail(id, "ALREADY_STARTED");
+    if (this.#seat(id) !== undefined) return this.#fail(id, "ALREADY_READY");
+    if (!this.#pending.has(id)) return this.#fail(id, "NOT_READY");
+    if (this.#seats.some((s) => s.avatar === avatar)) {
+      return this.#fail(id, "AVATAR_TAKEN");
+    }
+    this.#clearPending(id);
+    const seat: Seat = {
       id,
       name: this.#uniqueName(name),
       avatar,
@@ -123,10 +164,10 @@ export class GameSession {
       connected: true,
       graceTimer: null,
       graceEndsAt: null,
-    });
-    this.#hostId ??= id;
+    };
+    if (id === this.#hostId) this.#seats.unshift(seat);
+    else this.#seats.push(seat);
     this.#changed();
-    return null;
   }
 
   /**
@@ -134,8 +175,14 @@ export class GameSession {
    * is freed. In between, a bot takes it over so everyone else can finish.
    */
   leave(id: PlayerId): void {
+    this.#clearPending(id);
     const seat = this.#seat(id);
-    if (seat === undefined || (seat.isBot && this.started)) return;
+    if (seat === undefined) {
+      if (this.#hostId === id) this.#hostId = this.#nextHost();
+      this.#changed();
+      return;
+    }
+    if (seat.isBot && this.started) return;
     this.#clearGrace(seat);
     if (this.started && !this.isOver) {
       seat.isBot = true;
@@ -143,9 +190,7 @@ export class GameSession {
     } else {
       this.#seats.splice(this.#seats.indexOf(seat), 1);
     }
-    if (this.#hostId === id) {
-      this.#hostId = this.#seats.find((s) => !s.isBot)?.id ?? null;
-    }
+    if (this.#hostId === id) this.#hostId = this.#nextHost();
     this.#changed();
     this.#scheduleBots();
   }
@@ -162,7 +207,12 @@ export class GameSession {
   /** A dropped player is back. Catch them up on where the game is. */
   reconnect(id: PlayerId): void {
     const seat = this.#seat(id);
-    if (seat === undefined || seat.isBot) return;
+    if (seat === undefined) {
+      // Still in the waiting room without a seat, for example a host who refreshed.
+      if (this.#pending.has(id)) this.sync(id);
+      return;
+    }
+    if (seat.isBot) return;
     seat.connected = true;
     this.#clearGrace(seat);
     this.#changed();
@@ -179,8 +229,13 @@ export class GameSession {
   start(id: PlayerId): void {
     if (this.started) return this.#fail(id, "ALREADY_STARTED");
     if (this.#hostId !== id) return this.#fail(id, "NOT_HOST");
+    if (this.#seat(id) === undefined) return this.#fail(id, "NOT_READY");
     if (this.#seatsAfterFilling() < 2) {
       return this.#fail(id, "NOT_ENOUGH_PLAYERS");
+    }
+    // Anyone still hanging around without a seat has missed the game.
+    for (const waiting of [...this.#pending.keys()]) {
+      this.#kick(waiting, "GAME_STARTED");
     }
     this.#beginGame();
   }
@@ -242,12 +297,30 @@ export class GameSession {
     this.#botTimer = null;
     this.#clearNextHoleTimer();
     for (const seat of this.#seats) this.#clearGrace(seat);
+    for (const id of [...this.#pending.keys()]) this.#clearPending(id);
   }
 
   // Internals
 
   #seat(id: PlayerId): Seat | undefined {
     return this.#seats.find((s) => s.id === id);
+  }
+
+  #nextHost(): PlayerId | null {
+    return this.#seats.find((s) => !s.isBot)?.id ?? null;
+  }
+
+  #clearPending(id: PlayerId): void {
+    const timer = this.#pending.get(id);
+    if (timer !== undefined) clearTimeout(timer);
+    this.#pending.delete(id);
+  }
+
+  /** Drop a connection that never took a seat. */
+  #kick(id: PlayerId, reason: RoomClosedReason): void {
+    this.#clearPending(id);
+    this.#options.send(id, "closed", { reason });
+    this.#options.onKick?.(id, reason);
   }
 
   #fail(id: PlayerId, code: RoomErrorCode): void {
@@ -383,6 +456,9 @@ export class GameSession {
     const snapshot = this.snapshot();
     for (const seat of this.#seats) {
       if (!seat.isBot) this.#options.send(seat.id, "lobby", snapshot);
+    }
+    for (const id of this.#pending.keys()) {
+      this.#options.send(id, "lobby", snapshot);
     }
     this.#options.onLobbyChange?.(snapshot);
   }

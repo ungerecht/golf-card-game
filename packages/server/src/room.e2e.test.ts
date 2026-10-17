@@ -6,7 +6,9 @@ import {
   ROOM_NAME,
   type GameUpdate,
   type LobbySnapshot,
+  type RoomClosed,
   type RoomError,
+  type RoomStatusResponse,
 } from "@golf/shared";
 import { createGameServer } from "./server";
 
@@ -28,11 +30,23 @@ class Player {
   lobby: LobbySnapshot[] = [];
   game: GameUpdate[] = [];
   errors: RoomError[] = [];
+  closed: RoomClosed[] = [];
 
   constructor(readonly room: Room) {
     room.onMessage("lobby", (m: LobbySnapshot) => this.lobby.push(m));
     room.onMessage("game", (m: GameUpdate) => this.game.push(m));
     room.onMessage("error", (m: RoomError) => this.errors.push(m));
+    room.onMessage("closed", (m: RoomClosed) => this.closed.push(m));
+  }
+
+  /** Claim a seat, and wait until the server has shown us in the roster. */
+  async ready(name: string, avatar = "visor"): Promise<this> {
+    this.room.send("ready", { name, avatar });
+    await until(
+      () => this.lobby.at(-1)?.players.some((p) => p.id === this.id) ?? false,
+      `${name} to get a seat`,
+    );
+    return this;
   }
 
   get id(): string {
@@ -51,12 +65,12 @@ class Player {
 }
 
 async function until(
-  check: () => boolean,
+  check: () => boolean | Promise<boolean>,
   what: string,
   ms = 3000,
 ): Promise<void> {
   const deadline = Date.now() + ms;
-  while (!check()) {
+  while (!(await check())) {
     if (Date.now() > deadline) throw new Error(`Timed out waiting for ${what}`);
     await new Promise((r) => setTimeout(r, 10));
   }
@@ -64,6 +78,7 @@ async function until(
 
 let server: Server;
 let client: Client;
+let baseUrl: string;
 
 beforeAll(async () => {
   const port = await freePort();
@@ -71,8 +86,11 @@ beforeAll(async () => {
     botDelayMs: 5,
     reconnectGraceMs: 1000,
     nextHoleDelayMs: 200,
+    readyTimeoutMs: 1000,
+    hostReconnectMs: 400,
   });
   await server.listen(port);
+  baseUrl = `http://localhost:${port}`;
   client = new Client(`ws://localhost:${port}`);
 });
 
@@ -80,12 +98,23 @@ afterAll(async () => {
   await server.gracefullyShutdown(false);
 });
 
+/** Connect to a new room. The player is in the waiting room but has no seat. */
+async function connectHost(
+  settings: Record<string, unknown> = {},
+): Promise<Player> {
+  const room = await client.create(ROOM_NAME, { settings });
+  const player = new Player(room);
+  await until(() => player.lobby.length > 0, "the lobby");
+  return player;
+}
+
+/** Create a room and take the first seat. */
 async function host(settings: Record<string, unknown> = {}): Promise<Player> {
-  const room = await client.create(ROOM_NAME, {
-    name: "Ann",
-    avatar: "visor",
-    settings,
-  });
+  return (await connectHost(settings)).ready("Ann", "visor");
+}
+
+async function connect(code: string): Promise<Player> {
+  const room = await client.joinById(code);
   const player = new Player(room);
   await until(() => player.lobby.length > 0, "the lobby");
   return player;
@@ -96,15 +125,17 @@ async function join(
   name: string,
   avatar = "teal",
 ): Promise<Player> {
-  const room = await client.joinById(code, { name, avatar });
-  const player = new Player(room);
-  await until(() => player.lobby.length > 0, "the lobby");
-  return player;
+  return (await connect(code)).ready(name, avatar);
+}
+
+async function status(code: string): Promise<RoomStatusResponse> {
+  const response = await fetch(`${baseUrl}/rooms/${code}`);
+  return (await response.json()) as RoomStatusResponse;
 }
 
 describe("creating and joining a room", () => {
   it("uses a readable lobby code as the room id", async () => {
-    const ann = await host({ holes: 3 });
+    const ann = await connectHost({ holes: 3 });
     expect(ann.room.roomId).toMatch(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{5}$/);
     expect(ann.latestLobby.code).toBe(ann.room.roomId);
     expect(ann.latestLobby.hostId).toBe(ann.id);
@@ -113,14 +144,18 @@ describe("creating and joining a room", () => {
       maxPlayers: 4,
       botDifficulty: "normal",
     });
+    // Connecting is not enough to get a seat.
+    expect(ann.latestLobby.players).toEqual([]);
     await ann.room.leave();
   });
 
-  it("lets friends join by code and shows everyone the roster", async () => {
-    const ann = await host();
-    const ben = await join(ann.room.roomId, "Ben");
-    await until(() => ann.latestLobby.players.length === 2, "Ben to appear");
+  it("seats people when they press ready, host first", async () => {
+    const ann = await connectHost();
+    const ben = await connect(ann.room.roomId);
+    await ben.ready("Ben", "teal");
+    await ann.ready("Ann", "visor");
 
+    await until(() => ben.latestLobby.players.length === 2, "both seats");
     expect(ben.latestLobby.players.map((p) => p.name)).toEqual(["Ann", "Ben"]);
     expect(ben.latestLobby.hostId).toBe(ann.id);
     await ben.room.leave();
@@ -128,39 +163,126 @@ describe("creating and joining a room", () => {
     await ann.room.leave();
   });
 
-  it("rejects a bad name, a bad avatar and unknown codes", async () => {
+  it("rejects bad settings and unknown codes", async () => {
     await expect(
-      client.create(ROOM_NAME, { name: "", avatar: "visor" }),
+      client.create(ROOM_NAME, { settings: { holes: 4 } }),
     ).rejects.toBeDefined();
-    await expect(
-      client.create(ROOM_NAME, { name: "Ann", avatar: "dragon" }),
-    ).rejects.toBeDefined();
-    await expect(
-      client.create(ROOM_NAME, {
-        name: "Ann",
-        avatar: "visor",
-        settings: { holes: 4 },
-      }),
-    ).rejects.toBeDefined();
-    await expect(
-      client.joinById("ZZZZZ", { name: "Ben", avatar: "teal" }),
-    ).rejects.toBeDefined();
+    await expect(client.joinById("ZZZZZ")).rejects.toBeDefined();
+  });
 
-    const ann = await host();
-    await expect(
-      client.joinById(ann.room.roomId, { name: "Ben", avatar: "nope" }),
-    ).rejects.toBeDefined();
+  it("answers a bad name or avatar with an error and no seat", async () => {
+    const ann = await connectHost();
+    ann.room.send("ready", { name: "", avatar: "visor" });
+    ann.room.send("ready", { name: "Ann", avatar: "dragon" });
+    await until(() => ann.errors.length === 2, "two errors");
+    expect(ann.errors.map((e) => e.code)).toEqual([
+      "BAD_MESSAGE",
+      "BAD_MESSAGE",
+    ]);
+    expect(ann.latestLobby.players).toEqual([]);
     await ann.room.leave();
   });
 
-  it("refuses a join when the room is full", async () => {
-    const ann = await host({ maxPlayers: 2 });
-    const ben = await join(ann.room.roomId, "Ben");
-    await expect(
-      client.joinById(ann.room.roomId, { name: "Cy", avatar: "chip" }),
-    ).rejects.toBeDefined();
+  it("refuses an avatar that is taken", async () => {
+    const ann = await host();
+    const ben = await connect(ann.room.roomId);
+    ben.room.send("ready", { name: "Ben", avatar: "visor" });
+    await until(() => ben.errors.length > 0, "an error for Ben");
+    expect(ben.errors.at(-1)).toEqual({ code: "AVATAR_TAKEN" });
+    await ben.ready("Ben", "teal");
     await ben.room.leave();
     await ann.room.leave();
+  });
+
+  it("refuses a connection when the room is full", async () => {
+    const ann = await host({ maxPlayers: 2 });
+    const ben = await join(ann.room.roomId, "Ben");
+    await expect(client.joinById(ann.room.roomId)).rejects.toBeDefined();
+    await ben.room.leave();
+    await ann.room.leave();
+  });
+});
+
+describe("the waiting room", () => {
+  it("closes the room when the host leaves", async () => {
+    const ann = await host();
+    const ben = await join(ann.room.roomId, "Ben");
+    const code = ann.room.roomId;
+    await ann.room.leave();
+    await until(() => ben.closed.length > 0, "the room to close");
+    expect(ben.closed.at(-1)).toEqual({ reason: "HOST_LEFT" });
+    await expect(client.joinById(code)).rejects.toBeDefined();
+  });
+
+  it("keeps the room when a guest leaves", async () => {
+    const ann = await host();
+    const ben = await join(ann.room.roomId, "Ben");
+    await ben.room.leave();
+    await until(() => ann.latestLobby.players.length === 1, "Ben to go");
+    expect(ann.closed).toEqual([]);
+    expect((await status(ann.room.roomId)).status).toBe("open");
+    await ann.room.leave();
+  });
+
+  it("lets a host who refreshes come back in time", async () => {
+    const ann = await host();
+    const token = ann.room.reconnectionToken;
+    ann.room.connection.close(4002);
+    const back = new Player(await client.reconnect(token));
+    await until(() => back.lobby.length > 0, "the lobby after reconnecting");
+    expect(back.latestLobby.hostId).toBe(ann.id);
+    expect(back.latestLobby.players.map((p) => p.name)).toEqual(["Ann"]);
+    expect((await status(back.room.roomId)).status).toBe("open");
+    await back.room.leave();
+  });
+
+  it("closes the room if the host does not come back in time", async () => {
+    const ann = await host();
+    const ben = await join(ann.room.roomId, "Ben");
+    ann.room.connection.close(4002);
+    await until(() => ben.closed.length > 0, "the room to close", 3000);
+    expect(ben.closed.at(-1)).toEqual({ reason: "HOST_LEFT" });
+  });
+
+  it("drops someone who never presses ready", async () => {
+    const ann = await host();
+    const idle = await connect(ann.room.roomId);
+    await until(() => idle.closed.length > 0, "the idle kick", 3000);
+    expect(idle.closed.at(-1)).toEqual({ reason: "TIMED_OUT" });
+    await until(
+      async () => (await status(ann.room.roomId)).status === "open",
+      "room to be open",
+    );
+    expect(ann.closed).toEqual([]);
+    await ann.room.leave();
+  });
+});
+
+describe("GET /rooms/:code", () => {
+  it("says whether a code can be joined", async () => {
+    expect((await status("ZZZZZ")).status).toBe("missing");
+
+    const ann = await host({ maxPlayers: 2, holes: 3 });
+    const code = ann.room.roomId;
+    expect((await status(code)).status).toBe("open");
+    // Lower case is fine, codes get typed by hand.
+    expect((await status(code.toLowerCase())).status).toBe("open");
+
+    const ben = await join(code, "Ben");
+    expect((await status(code)).status).toBe("full");
+
+    ann.room.send("start");
+    await until(() => ben.game.length > 0, "the game to start");
+    expect((await status(code)).status).toBe("started");
+    await ben.room.leave();
+    await ann.room.leave();
+  });
+
+  it("can be called from the browser app on another origin", async () => {
+    const response = await fetch(`${baseUrl}/rooms/ZZZZZ`, {
+      headers: { origin: "http://localhost:5173" },
+    });
+    expect(response.headers.get("access-control-allow-origin")).toBeTruthy();
   });
 });
 
@@ -185,9 +307,7 @@ describe("playing a game", () => {
     expect(ann.latestGame.view.phase.type).toBe("initialFlip");
 
     // No more joiners once it has started.
-    await expect(
-      client.joinById(ann.room.roomId, { name: "Cy", avatar: "chip" }),
-    ).rejects.toBeDefined();
+    await expect(client.joinById(ann.room.roomId)).rejects.toBeDefined();
 
     ann.room.send("action", { type: "flipInitial", slot: 2 });
     await until(

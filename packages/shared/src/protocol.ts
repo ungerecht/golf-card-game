@@ -32,23 +32,34 @@ export const PlayerNameSchema = z
   .max(PLAYER_NAME_MAX_LENGTH)
   .regex(/^[^\p{Cc}]+$/u);
 
-/** What every player sends when joining, the host included. */
-export const JoinOptionsSchema = z.object({
+/**
+ * What a player sends to claim a seat, the host included. Connecting alone
+ * only puts you in the waiting room; this is what takes a slot.
+ */
+export const ReadyPayloadSchema = z.object({
   name: PlayerNameSchema,
   avatar: z.literal(AVATAR_IDS),
 });
-export type JoinOptions = z.infer<typeof JoinOptionsSchema>;
+export type ReadyPayload = z.infer<typeof ReadyPayloadSchema>;
 
 /** What the host sends when creating a room. Missing settings get their defaults. */
-export const CreateOptionsSchema = JoinOptionsSchema.extend({
+export const CreateOptionsSchema = z.object({
   settings: GameSettingsSchema.default(DEFAULT_SETTINGS),
 });
 export type CreateOptions = z.infer<typeof CreateOptionsSchema>;
+
+/** Answer of `GET /rooms/:code`, so a client can check a code before connecting. */
+export type RoomStatus = "open" | "full" | "started" | "missing";
+export interface RoomStatusResponse {
+  readonly status: RoomStatus;
+}
 
 // Client to server
 
 /** Message types a client can send. "start" has no payload. */
 export const CLIENT_MESSAGE = {
+  /** Claim a seat with a name and avatar. The payload is a `ReadyPayload`. */
+  ready: "ready",
   /** The host starts the game. */
   start: "start",
   /** After the game is over, the host starts another one with the same rules and players. */
@@ -137,10 +148,19 @@ export type RoomErrorCode =
   | "NOT_STARTED"
   | "NOT_GAME_OVER"
   | "ROOM_FULL"
+  | "NOT_READY"
+  | "ALREADY_READY"
+  | "AVATAR_TAKEN"
   | "BAD_MESSAGE";
 
 export interface RoomError {
   readonly code: RoomErrorCode;
+}
+
+export type RoomClosedReason = "HOST_LEFT" | "TIMED_OUT" | "GAME_STARTED";
+
+export interface RoomClosed {
+  readonly reason: RoomClosedReason;
 }
 
 /** Message types the server sends, with their payloads. */
@@ -148,6 +168,8 @@ export interface ServerMessages {
   lobby: LobbySnapshot;
   game: GameUpdate;
   error: RoomError;
+  /** The room is closing and the connection is about to be dropped. */
+  closed: RoomClosed;
 }
 export type ServerMessageType = keyof ServerMessages;
 

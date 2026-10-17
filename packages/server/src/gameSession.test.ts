@@ -2,11 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_SETTINGS,
   chooseAction,
+  type AvatarId,
   createSeededRng,
   type GameSettings,
   type GameUpdate,
   type LobbySnapshot,
+  type RoomClosed,
   type RoomError,
+  type RoomErrorCode,
   type ServerMessages,
   type ServerMessageType,
 } from "@golf/shared";
@@ -15,11 +18,13 @@ import {
   GameSession,
   type SessionOptions,
 } from "./gameSession";
+import { normalizeLobbyCode } from "./codes";
 
 interface Inbox {
   lobby: LobbySnapshot[];
   game: GameUpdate[];
   error: RoomError[];
+  closed: RoomClosed[];
 }
 
 function setup(
@@ -31,7 +36,7 @@ function setup(
   const inbox = (id: string): Inbox => {
     let box = inboxes.get(id);
     if (box === undefined) {
-      box = { lobby: [], game: [], error: [] };
+      box = { lobby: [], game: [], error: [], closed: [] };
       inboxes.set(id, box);
     }
     return box;
@@ -55,6 +60,19 @@ function setup(
   return { session, inbox, changes };
 }
 
+/** Connect, then claim a seat, the way a client does. */
+function join(
+  session: GameSession,
+  id: string,
+  name: string,
+  avatar: AvatarId,
+): RoomErrorCode | null {
+  const error = session.connect(id);
+  if (error !== null) return error;
+  session.ready(id, name, avatar);
+  return null;
+}
+
 const last = <T>(items: readonly T[]): T => {
   const item = items.at(-1);
   if (item === undefined) throw new Error("nothing received");
@@ -68,11 +86,18 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe("room codes", () => {
+  it("normalizes typed room codes the same way the client does", () => {
+    expect(normalizeLobbyCode("ab c-d1")).toBe("ABCD");
+    expect(normalizeLobbyCode("abcdefgh")).toBe("ABCDE");
+  });
+});
+
 describe("the lobby", () => {
   it("makes the first player the host and seats everyone in join order", () => {
     const { session, inbox } = setup();
-    expect(session.join("a", "Ann", "visor")).toBeNull();
-    expect(session.join("b", "Ben", "teal")).toBeNull();
+    expect(join(session, "a", "Ann", "visor")).toBeNull();
+    expect(join(session, "b", "Ben", "teal")).toBeNull();
 
     const snapshot = last(inbox("b").lobby);
     expect(snapshot.code).toBe("ABCDE");
@@ -86,18 +111,19 @@ describe("the lobby", () => {
 
   it("tells everyone when someone joins", () => {
     const { session, inbox } = setup();
-    session.join("a", "Ann", "visor");
+    join(session, "a", "Ann", "visor");
     const before = inbox("a").lobby.length;
-    session.join("b", "Ben", "teal");
-    expect(inbox("a").lobby.length).toBe(before + 1);
+    join(session, "b", "Ben", "teal");
+    // One update for connecting, one for taking a seat.
+    expect(inbox("a").lobby.length).toBe(before + 2);
     expect(last(inbox("a").lobby).players).toHaveLength(2);
   });
 
   it("renames players who pick a name that is already taken", () => {
     const { session, inbox } = setup();
-    session.join("a", "Sam", "visor");
-    session.join("b", "sam", "teal");
-    session.join("c", "Sam", "chip");
+    join(session, "a", "Sam", "visor");
+    join(session, "b", "sam", "teal");
+    join(session, "c", "Sam", "chip");
     expect(last(inbox("c").lobby).players.map((p) => p.name)).toEqual([
       "Sam",
       "sam 2",
@@ -107,18 +133,18 @@ describe("the lobby", () => {
 
   it("refuses players once the room is full", () => {
     const { session } = setup({ maxPlayers: 2 });
-    session.join("a", "Ann", "visor");
-    session.join("b", "Ben", "teal");
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
     expect(session.joinError()).toBe("ROOM_FULL");
-    expect(session.join("c", "Cy", "chip")).toBe("ROOM_FULL");
+    expect(join(session, "c", "Cy", "chip")).toBe("ROOM_FULL");
     expect(session.playerCount).toBe(2);
   });
 
   it("frees the seat of a player who leaves, and passes on the host", () => {
     const { session, inbox } = setup();
-    session.join("a", "Ann", "visor");
-    session.join("b", "Ben", "teal");
-    session.join("c", "Cy", "chip");
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
+    join(session, "c", "Cy", "chip");
     session.leave("a");
 
     const snapshot = last(inbox("b").lobby);
@@ -127,22 +153,163 @@ describe("the lobby", () => {
     expect(session.joinError()).toBeNull();
   });
 
+  it("puts a new connection in the waiting room without a seat", () => {
+    const { session, inbox } = setup();
+    expect(session.connect("a")).toBeNull();
+    const snapshot = last(inbox("a").lobby);
+    expect(snapshot.hostId).toBe("a");
+    expect(snapshot.players).toEqual([]);
+    expect(session.playerCount).toBe(0);
+  });
+
+  it("always seats the host first, even if a guest readies up before them", () => {
+    const { session, inbox } = setup();
+    session.connect("host");
+    session.connect("guest");
+    session.ready("guest", "Gus", "teal");
+    session.ready("host", "Hana", "visor");
+    expect(last(inbox("guest").lobby).players.map((p) => p.id)).toEqual([
+      "host",
+      "guest",
+    ]);
+  });
+
+  it("counts connections without a seat towards the room size", () => {
+    const { session } = setup({ maxPlayers: 2 });
+    session.connect("a");
+    session.connect("b");
+    expect(session.connect("c")).toBe("ROOM_FULL");
+  });
+
+  it("refuses an avatar someone else already has", () => {
+    const { session, inbox } = setup();
+    join(session, "a", "Ann", "visor");
+    session.connect("b");
+    session.ready("b", "Ben", "visor");
+    expect(last(inbox("b").error).code).toBe("AVATAR_TAKEN");
+    expect(session.playerCount).toBe(1);
+    session.ready("b", "Ben", "teal");
+    expect(session.playerCount).toBe(2);
+  });
+
+  it("gives the avatar to whoever asks first when two pick at once", () => {
+    const { session, inbox } = setup();
+    session.connect("a");
+    session.connect("b");
+    session.ready("a", "Ann", "chip");
+    session.ready("b", "Ben", "chip");
+    expect(last(inbox("b").error).code).toBe("AVATAR_TAKEN");
+    expect(last(inbox("a").lobby).players.map((p) => p.avatar)).toEqual([
+      "chip",
+    ]);
+  });
+
+  it("frees an avatar when its player leaves", () => {
+    const { session } = setup();
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
+    session.leave("b");
+    expect(join(session, "c", "Cy", "teal")).toBeNull();
+    expect(session.playerCount).toBe(2);
+  });
+
+  it("does not seat someone twice", () => {
+    const { session, inbox } = setup();
+    join(session, "a", "Ann", "visor");
+    session.ready("a", "Ann", "teal");
+    expect(last(inbox("a").error).code).toBe("ALREADY_READY");
+    expect(session.playerCount).toBe(1);
+  });
+
+  it("ignores ready from someone who never connected", () => {
+    const { session, inbox } = setup();
+    session.ready("ghost", "Boo", "visor");
+    expect(last(inbox("ghost").error).code).toBe("NOT_READY");
+    expect(session.playerCount).toBe(0);
+  });
+
+  it("drops a connection that has not readied up in time", () => {
+    const kicked: string[] = [];
+    const { session, inbox } = setup({}, 1, {
+      readyTimeoutMs: 1000,
+      onKick: (id) => kicked.push(id),
+    });
+    join(session, "a", "Ann", "visor");
+    session.connect("b");
+    vi.advanceTimersByTime(999);
+    expect(kicked).toEqual([]);
+    vi.advanceTimersByTime(1);
+    expect(kicked).toEqual(["b"]);
+    expect(last(inbox("b").closed).reason).toBe("TIMED_OUT");
+  });
+
+  it("does not drop someone who pressed ready", () => {
+    const kicked: string[] = [];
+    const { session } = setup({}, 1, {
+      readyTimeoutMs: 1000,
+      onKick: (id) => kicked.push(id),
+    });
+    join(session, "a", "Ann", "visor");
+    vi.advanceTimersByTime(5000);
+    expect(kicked).toEqual([]);
+  });
+
+  it("frees the slot of a connection that leaves without a seat", () => {
+    const { session } = setup({ maxPlayers: 2 });
+    session.connect("a");
+    session.connect("b");
+    session.leave("b");
+    expect(session.connect("c")).toBeNull();
+  });
+
+  it("will not start until the host has a seat", () => {
+    const { session, inbox } = setup();
+    session.connect("host");
+    join(session, "b", "Ben", "teal");
+    session.start("host");
+    expect(last(inbox("host").error).code).toBe("NOT_READY");
+    expect(session.started).toBe(false);
+  });
+
+  it("lets go of anyone still without a seat when the game starts", () => {
+    const kicked: string[] = [];
+    const { session, inbox } = setup({}, 1, {
+      onKick: (id) => kicked.push(id),
+    });
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
+    session.connect("late");
+    session.start("a");
+    expect(kicked).toEqual(["late"]);
+    expect(last(inbox("late").closed).reason).toBe("GAME_STARTED");
+  });
+
+  it("keeps a waiting host who reconnects, and sends them the lobby again", () => {
+    const { session, inbox } = setup();
+    session.connect("host");
+    const before = inbox("host").lobby.length;
+    session.disconnect("host");
+    session.reconnect("host");
+    expect(inbox("host").lobby.length).toBeGreaterThan(before);
+    expect(session.hostId).toBe("host");
+  });
+
   it("reports every change for the room listing", () => {
     const { session, changes } = setup();
-    session.join("a", "Ann", "visor");
-    session.join("b", "Ben", "teal");
-    expect(changes.map((c) => c.players.length)).toEqual([1, 2]);
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
+    expect(changes.map((c) => c.players.length)).toEqual([0, 1, 1, 2]);
   });
 });
 
 describe("starting the game", () => {
   it("lets only the host start, and needs two players", () => {
     const { session, inbox } = setup();
-    session.join("a", "Ann", "visor");
+    join(session, "a", "Ann", "visor");
     session.start("a");
     expect(last(inbox("a").error)).toEqual({ code: "NOT_ENOUGH_PLAYERS" });
 
-    session.join("b", "Ben", "teal");
+    join(session, "b", "Ben", "teal");
     session.start("b");
     expect(last(inbox("b").error)).toEqual({ code: "NOT_HOST" });
     expect(session.started).toBe(false);
@@ -155,8 +322,8 @@ describe("starting the game", () => {
 
   it("seats the host first so they deal the first hole", () => {
     const { session } = setup();
-    session.join("a", "Ann", "visor");
-    session.join("b", "Ben", "teal");
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
     session.start("a");
     expect(session.game?.players.map((p) => p.id)).toEqual(["a", "b"]);
     expect(session.game?.dealerIndex).toBe(0);
@@ -164,8 +331,8 @@ describe("starting the game", () => {
 
   it("gives each player a view of their own seat, and nothing hidden", () => {
     const { session, inbox } = setup();
-    session.join("a", "Ann", "visor");
-    session.join("b", "Ben", "teal");
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
     session.start("a");
 
     for (const id of ["a", "b"]) {
@@ -182,15 +349,15 @@ describe("starting the game", () => {
 
   it("refuses new players once the game has started", () => {
     const { session } = setup();
-    session.join("a", "Ann", "visor");
-    session.join("b", "Ben", "teal");
+    join(session, "a", "Ann", "visor");
+    join(session, "b", "Ben", "teal");
     session.start("a");
-    expect(session.join("c", "Cy", "chip")).toBe("ALREADY_STARTED");
+    expect(join(session, "c", "Cy", "chip")).toBe("ALREADY_STARTED");
   });
 
   it("fills empty seats with bots when the host switched them on", () => {
     const { session, inbox } = setup({ bots: true, maxPlayers: 4 });
-    session.join("a", "Ann", "visor");
+    join(session, "a", "Ann", "visor");
     session.start("a");
 
     const players = last(inbox("a").lobby).players;
@@ -209,15 +376,15 @@ describe("starting the game", () => {
 describe("playing", () => {
   function twoPlayers() {
     const harness = setup();
-    harness.session.join("a", "Ann", "visor");
-    harness.session.join("b", "Ben", "teal");
+    join(harness.session, "a", "Ann", "visor");
+    join(harness.session, "b", "Ben", "teal");
     harness.session.start("a");
     return harness;
   }
 
   it("rejects actions before the game starts", () => {
     const { session, inbox } = setup();
-    session.join("a", "Ann", "visor");
+    join(session, "a", "Ann", "visor");
     session.act("a", { type: "flipInitial", slot: 0 });
     expect(last(inbox("a").error)).toEqual({ code: "NOT_STARTED" });
   });
@@ -283,7 +450,7 @@ describe("playing", () => {
 describe("bots", () => {
   it("play their turns by themselves, one move at a time", () => {
     const { session } = setup({ bots: true, maxPlayers: 3 });
-    session.join("a", "Ann", "visor");
+    join(session, "a", "Ann", "visor");
     session.start("a");
 
     const faceUp = () =>
@@ -298,7 +465,7 @@ describe("bots", () => {
   it("use the difficulty the host chose", () => {
     const run = (botDifficulty: "easy" | "normal") => {
       const { session } = setup({ bots: true, maxPlayers: 2, botDifficulty });
-      session.join("a", "Ann", "visor");
+      join(session, "a", "Ann", "visor");
       session.start("a");
       vi.advanceTimersByTime(10_000);
       return session.game;
@@ -309,7 +476,7 @@ describe("bots", () => {
 
   it("play a whole game with one person, who is helped by a bot", () => {
     const { session, inbox } = setup({ bots: true, maxPlayers: 3 });
-    session.join("a", "Ann", "visor");
+    join(session, "a", "Ann", "visor");
     session.start("a");
 
     // Ann plays like a bot would, and starts each hole when asked.
@@ -337,7 +504,7 @@ describe("bots", () => {
 
   it("stop when the session is disposed", () => {
     const { session } = setup({ bots: true, maxPlayers: 2 });
-    session.join("a", "Ann", "visor");
+    join(session, "a", "Ann", "visor");
     session.start("a");
     session.dispose();
     const before = JSON.stringify(session.game);
@@ -375,8 +542,8 @@ const phase = (h: Harness) => h.session.game?.phase.type;
 /** Two people and no bots, with the initial flip done, so it is somebody's turn. */
 function twoPeopleMidGame(extra: Partial<SessionOptions> = {}) {
   const h = setup({ holes: 3 }, 1, { botDelayMs: 10, ...extra });
-  h.session.join("a", "Ann", "visor");
-  h.session.join("b", "Ben", "teal");
+  join(h.session, "a", "Ann", "visor");
+  join(h.session, "b", "Ben", "teal");
   h.session.start("a");
   for (const id of ["a", "b"]) {
     h.session.act(id, { type: "flipInitial", slot: 0 });
@@ -446,8 +613,8 @@ describe("a dropped player's reconnect clock", () => {
 
   it("starts at once for a player who still has initial flips to make", () => {
     const h = setup({ holes: 3 }, 1, { reconnectGraceMs: GRACE });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
     h.session.disconnect("b");
     expect(
@@ -457,8 +624,8 @@ describe("a dropped player's reconnect clock", () => {
 
   it("is two minutes unless the room is configured otherwise", () => {
     const h = setup({ holes: 3 }, 1);
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
     h.session.disconnect("b");
     const lobby = last(h.inbox("a").lobby);
@@ -499,8 +666,8 @@ describe("a dropped player's reconnect clock", () => {
 
   it("is not used in the lobby, where a dropped player just loses their seat", () => {
     const h = setup();
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     expect(h.session.holdsSeatsOnDrop).toBe(false);
     h.session.start("a");
     expect(h.session.holdsSeatsOnDrop).toBe(true);
@@ -513,7 +680,7 @@ describe("between holes", () => {
       botDelayMs: 1,
       ...extra,
     });
-    h.session.join("a", "Ann", "visor");
+    join(h.session, "a", "Ann", "visor");
     h.session.start("a");
     autoplay(h, ["a"], () => phase(h) === "holeOver");
     return h;
@@ -524,8 +691,8 @@ describe("between holes", () => {
       botDelayMs: 1,
       nextHoleDelayMs: 30_000,
     });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
     autoplay(h, ["a", "b"], () => phase(h) === "holeOver");
 
@@ -562,8 +729,8 @@ describe("between holes", () => {
 
   it("does not run a countdown outside the gap between holes", () => {
     const h = setup({ holes: 3 });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
     expect(last(h.inbox("a").game).nextHoleAt).toBeNull();
   });
@@ -575,7 +742,7 @@ describe("the end of the game", () => {
       botDelayMs: 1,
       nextHoleDelayMs: 50,
     });
-    h.session.join("a", "Ann", "visor");
+    join(h.session, "a", "Ann", "visor");
     h.session.start("a");
     autoplay(h, ["a"], () => phase(h) === "gameOver");
     return h;
@@ -610,8 +777,8 @@ describe("the end of the game", () => {
 
   it("only has a result once the game is over", () => {
     const h = setup({ holes: 3 });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
     expect(last(h.inbox("a").game).result).toBeNull();
   });
@@ -632,8 +799,8 @@ describe("the end of the game", () => {
 
   it("only lets the host do it, and only once the game is over", () => {
     const h = setup({ holes: 3 }, 1);
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.playAgain("a");
     expect(last(h.inbox("a").error)).toEqual({ code: "NOT_STARTED" });
     h.session.start("a");
@@ -641,16 +808,16 @@ describe("the end of the game", () => {
     expect(last(h.inbox("a").error)).toEqual({ code: "NOT_GAME_OVER" });
 
     const done = atGameOver();
-    done.session.join("b", "Ben", "teal");
+    join(done.session, "b", "Ben", "teal");
     done.session.playAgain("b");
     expect(done.session.isOver).toBe(true);
   });
 
   it("lets each player leave, which frees their seat for good", () => {
     const h = setup({ holes: 3 }, 2, { botDelayMs: 1, nextHoleDelayMs: 50 });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
-    h.session.join("c", "Cy", "chip");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
+    join(h.session, "c", "Cy", "chip");
     h.session.start("a");
     autoplay(h, ["a", "b", "c"], () => phase(h) === "gameOver");
 
@@ -664,9 +831,9 @@ describe("the end of the game", () => {
 
   it("keeps a player who left on the scoresheet, with their name and avatar", () => {
     const h = setup({ holes: 3 }, 2, { botDelayMs: 1, nextHoleDelayMs: 50 });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
-    h.session.join("c", "Cy", "chip");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
+    join(h.session, "c", "Cy", "chip");
     h.session.start("a");
     autoplay(h, ["a", "b", "c"], () => phase(h) === "gameOver");
 
@@ -685,9 +852,9 @@ describe("the end of the game", () => {
 
   it("passes the host role on when the host leaves, and puts the new host first", () => {
     const h = setup({ holes: 3 }, 2, { botDelayMs: 1, nextHoleDelayMs: 50 });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
-    h.session.join("c", "Cy", "chip");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
+    join(h.session, "c", "Cy", "chip");
     h.session.start("a");
     autoplay(h, ["a", "b", "c"], () => phase(h) === "gameOver");
 
@@ -702,8 +869,8 @@ describe("the end of the game", () => {
 
   it("refuses to start again with too few players, and changes nothing", () => {
     const h = setup({ holes: 3 }, 2, { botDelayMs: 1, nextHoleDelayMs: 50 });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
     autoplay(h, ["a", "b"], () => phase(h) === "gameOver");
 
@@ -719,8 +886,8 @@ describe("the end of the game", () => {
       botDelayMs: 1,
       nextHoleDelayMs: 50,
     });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
     autoplay(h, ["a", "b"], () => phase(h) === "gameOver");
     h.session.leave("b");
@@ -740,8 +907,8 @@ describe("the end of the game", () => {
       reconnectGraceMs: 10 * 60 * 1000,
       onTakeover: (id) => takeovers.push(id),
     });
-    h.session.join("a", "Ann", "visor");
-    h.session.join("b", "Ben", "teal");
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
     h.session.start("a");
 
     // In the last hole, whoever goes out drops. Nobody needs them any more,

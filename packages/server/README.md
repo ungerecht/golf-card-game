@@ -9,14 +9,15 @@ pnpm --filter @golf/server test
 
 ## How a game goes
 
-1. The host creates a room: `client.create("golf", { name, avatar, settings })`. Settings are validated by `GameSettingsSchema`, and any missing ones get their defaults. They cannot be changed afterwards.
-2. The room id is the lobby code: five characters with no `0`, `O`, `1`, `I` or `L`. Friends join with `client.joinById(code, { name, avatar })`. Names are 1 to 20 characters, avatars are ids from `AVATAR_IDS`. A name that is already taken gets a number added.
-3. The host sends `start`. If Bots is on, empty seats up to Max players are filled with bots. The host sits in seat 0 and deals the first hole. The room locks.
-4. Players send `action` messages (an `Action`, validated with `ActionSchema`). The room sends back what the player is allowed to see.
+1. The host creates a room: `client.create("golf", { settings })`. Settings are validated by `GameSettingsSchema`, and any missing ones get their defaults. They cannot be changed afterwards. Before connecting, `GET /rooms/ABCDE` answers `{ "status": "open" | "full" | "started" | "missing" }`, so a Join button can check a code first.
+2. The room id is the lobby code: five characters with no `0`, `O`, `1`, `I` or `L`. Friends connect with `client.joinById(code)`. Connecting only puts you in the waiting room: you get `lobby` snapshots but no seat. The first connection is the host. Connections count towards Max players, and one that does not send `ready` within a minute is dropped (`closed` with `TIMED_OUT`).
+3. A player takes a seat by sending `ready` with `{ name, avatar }`. Names are 1 to 20 characters, avatars are ids from `AVATAR_IDS`. A name that is already taken gets a number added. An avatar that is taken is refused with `AVATAR_TAKEN`, so two people picking at once is settled by who asks first. The host always takes the first seat.
+4. The host sends `start` (they need a seat, otherwise `NOT_READY`). If Bots is on, empty seats up to Max players are filled with bots. The host deals the first hole. Anyone still without a seat is dropped (`closed` with `GAME_STARTED`) and the room locks.
+5. Players send `action` messages (an `Action`, validated with `ActionSchema`). The room sends back what the player is allowed to see.
 
 ## Messages
 
-Client to server: `start` and `playAgain` (no payload, host only) and `action` (an `Action`).
+Client to server: `ready` (`{ name, avatar }`), `start` and `playAgain` (no payload, host only) and `action` (an `Action`).
 
 Server to client:
 
@@ -25,6 +26,7 @@ Server to client:
 | `lobby` | `LobbySnapshot`  | On joining, and whenever the roster, host or connection state changes. |
 | `game`  | `GameUpdate`     | After every action, and on reconnecting. A `GameView`, the events, `nextHoleAt` while a hole is waiting to start, and `result` once the game is over. |
 | `error` | `{ code }`       | Only to the sender of a bad request. Codes are in `RoomErrorCode`.     |
+| `closed` | `{ reason }`    | Just before the connection is dropped: `HOST_LEFT` (the waiting room is closing), `TIMED_OUT` or `GAME_STARTED`. |
 
 The server never sends `GameState`. Each player only gets `getPlayerView` for their own seat, so hidden cards cannot leak. Events are safe for everyone: the only private information is a card drawn from the deck, and that arrives in the view.
 
@@ -39,7 +41,9 @@ Clients are limited to 20 messages per second.
 
 ## Leaving and reconnecting
 
-- In the lobby, a player who leaves frees their seat. If it was the host, the next player becomes host.
+- In the waiting room, a guest who leaves or drops frees their seat and their avatar.
+- The host is the waiting room. If they leave on purpose, everyone gets `closed` with `HOST_LEFT` and the room is gone. If they only drop (a page refresh, say), they have 20 seconds to come back with `client.reconnect(reconnectionToken)` before the room closes.
+- Once the game has started that no longer applies: if the host leaves, hosting passes to the next person and a bot covers the seat.
 - During a game, a dropped player has 2 minutes to come back, but the clock only starts once the game is waiting for them: when it becomes their turn, or straight away if they still have initial flips to make. `LobbyPlayer.reconnectDeadline` is when it runs out, or `null` while it is not running. They get back in with `client.reconnect(reconnectionToken)` and receive a fresh `lobby` and `game` message.
 - If they do not come back, or leave on purpose, a bot takes over their seat and the game carries on.
 - Once the game is over, a player who drops is let go straight away.

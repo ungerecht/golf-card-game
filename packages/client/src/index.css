@@ -1,111 +1,325 @@
+/* One art pixel, in CSS pixels. usePixelScale() keeps this a whole number of device pixels. */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --px: 3px;
+  /* Interface sizes use this instead, so text and buttons stay usable on phones. */
+  --ui: max(var(--px), 2px);
 
-  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
-  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --felt: #1f5c3a;
+  --felt-dark: #174a2e;
+  --paper: #f6ecd2;
+  --paper-shade: #e2d3ad;
+  --ink: #2a2118;
+  --gold: #f0b429;
+  --gold-dark: #b9801a;
+  --danger: #b3382c;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --font: "Pixelify Sans", ui-monospace, monospace;
+  font-family: var(--font);
+  color: var(--ink);
+  line-height: 1.25;
+  font-size: max(16px, calc(var(--ui) * 6));
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  min-height: 100dvh;
+  background-color: var(--felt);
+  /* A faint checkered cloth */
+  background-image:
+    linear-gradient(45deg, var(--felt-dark) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--felt-dark) 25%, transparent 25%);
+  background-size: calc(var(--ui) * 8) calc(var(--ui) * 8);
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+img {
+  image-rendering: pixelated;
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 6);
+  /* Never narrower than a phone screen, however small an art pixel is there. */
+  max-width: max(calc(var(--px) * 180), min(100%, 480px));
+  margin: 0 auto;
+  padding: calc(var(--ui) * 8) 16px;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.screen.waiting {
+  max-width: max(calc(var(--px) * 300), min(100%, 480px));
+}
+
+.title {
+  color: var(--paper);
+  font-size: calc(var(--ui) * 16);
+  text-align: center;
+  text-shadow: calc(var(--ui) * 1) calc(var(--ui) * 1) 0 var(--ink);
+}
+
+.title.small {
+  font-size: calc(var(--ui) * 11);
+}
+
+/* Boxes with notched pixel corners */
+.panel,
+.button,
+input,
+select,
+.banner,
+.avatar-choice,
+.portrait {
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow:
+    0 calc(var(--ui) * -1) 0 0 var(--ink),
+    0 calc(var(--ui) * 1) 0 0 var(--ink),
+    calc(var(--ui) * -1) 0 0 0 var(--ink),
+    calc(var(--ui) * 1) 0 0 0 var(--ink),
+    0 calc(var(--ui) * 2) 0 0 rgb(0 0 0 / 0.3);
+}
+
+.panel {
+  width: 100%;
+  padding: calc(var(--ui) * 5);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 4);
+}
+
+.row {
+  display: flex;
+  gap: calc(var(--ui) * 4);
+  width: 100%;
+}
+
+.row > * {
+  flex: 1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 1.5);
+}
+
+.field > span,
+.label,
+legend {
+  font-weight: 700;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: max(44px, calc(var(--ui) * 12));
+  padding: 0 calc(var(--ui) * 3);
+  font: inherit;
+  background: #fffaf0;
+}
+
+.code-input {
+  text-align: center;
+  letter-spacing: calc(var(--ui) * 2);
+  text-transform: uppercase;
+  font-size: calc(var(--ui) * 8);
+}
+
+input:focus-visible,
+select:focus-visible,
+.button:focus-visible,
+.avatar-choice:focus-visible,
+.link:focus-visible {
+  outline: calc(var(--ui) * 1) dashed var(--gold);
+  outline-offset: calc(var(--ui) * 2);
+}
+
+.button {
+  min-height: max(44px, calc(var(--ui) * 13));
+  padding: 0 calc(var(--ui) * 5);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--paper-shade);
+}
+
+.button.primary {
+  background: var(--gold);
+}
+
+.button:hover:not(:disabled) {
+  translate: 0 calc(var(--ui) * -1);
+}
+
+.button:active:not(:disabled) {
+  translate: 0 calc(var(--ui) * 1);
+}
+
+.button:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.or {
+  margin: calc(var(--ui) * -2) 0;
+  color: var(--paper);
+}
+
+.banner {
+  width: 100%;
+  margin: 0;
+  padding: calc(var(--ui) * 3) calc(var(--ui) * 4);
+  background: #f9d9d3;
+  display: flex;
+  justify-content: space-between;
+  gap: calc(var(--ui) * 3);
+  align-items: center;
+}
+
+.link {
+  all: unset;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.hint {
+  margin: 0;
+  color: var(--paper);
+  text-align: center;
+}
+
+/* Waiting room */
+.code-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 1);
+}
+
+.code {
+  font-size: calc(var(--ui) * 14);
+  letter-spacing: calc(var(--ui) * 3);
+}
+
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--ui) * 5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 2);
+  width: calc(var(--px) * 64);
+  color: var(--paper);
+  text-align: center;
+}
+
+.slot-name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.slot.empty {
+  opacity: 0.7;
+}
+
+.portrait {
+  /* A portrait is 64 art pixels, always drawn at a whole number of device pixels. */
+  width: calc(var(--px) * 64);
+  height: calc(var(--px) * 64);
+  display: grid;
+  place-items: center;
+  background: var(--felt-dark);
+}
+
+.portrait.placeholder {
+  background: transparent;
+  box-shadow: none;
+  border: calc(var(--ui) * 1) dashed var(--paper);
+  color: var(--paper);
+  font-size: calc(var(--ui) * 16);
+}
+
+.avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar.grey {
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.6;
+}
+
+.tag {
+  padding: 0 calc(var(--ui) * 2);
+  background: var(--gold);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: center;
+  gap: calc(var(--ui) * 4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.avatar-grid legend {
+  grid-column: 1 / -1;
+  padding: 0 0 calc(var(--ui) * 2);
+}
+
+.avatar-choice {
+  /* Same whole-pixel rule as portraits, so the picked one and the rest stay crisp. */
+  width: calc(var(--px) * 64 + var(--ui) * 2);
+  padding: calc(var(--ui) * 1);
+  cursor: pointer;
+  background: var(--felt-dark);
+}
+
+.avatar-choice[aria-pressed="true"] {
+  background: var(--gold);
+  translate: 0 calc(var(--ui) * -1);
+}
+
+.avatar-choice:disabled {
+  cursor: not-allowed;
+}
+
+/* On a phone one art pixel is tiny, so draw the picker at double size, two across. */
+@media (max-width: 480px) {
+  .avatar-grid {
+    grid-template-columns: repeat(2, auto);
+  }
+
+  .avatar-choice {
+    width: calc(var(--px) * 128 + var(--ui) * 2);
+  }
 }

@@ -10,7 +10,10 @@ export function generateLobbyCode(rng: Rng = Math.random): string {
   return code;
 }
 
-/** Codes are typed by hand, so accept any case and stray spaces. */
+/** Codes are typed by hand: keep only characters that can be in one, in capitals. */
 export function normalizeLobbyCode(input: string): string {
-  return input.trim().toUpperCase();
+  return [...input.trim().toUpperCase()]
+    .filter((c) => LOBBY_CODE_ALPHABET.includes(c))
+    .join("")
+    .slice(0, LOBBY_CODE_LENGTH);
 }

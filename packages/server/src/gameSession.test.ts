@@ -18,6 +18,7 @@ import {
   GameSession,
   type SessionOptions,
 } from "./gameSession";
+import { normalizeLobbyCode } from "./codes";
 
 interface Inbox {
   lobby: LobbySnapshot[];
@@ -83,6 +84,13 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.useRealTimers();
+});
+
+describe("room codes", () => {
+  it("normalizes typed room codes the same way the client does", () => {
+    expect(normalizeLobbyCode("ab c-d1")).toBe("ABCD");
+    expect(normalizeLobbyCode("abcdefgh")).toBe("ABCDE");
+  });
 });
 
 describe("the lobby", () => {

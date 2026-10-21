@@ -1,5 +1,12 @@
-import type { Action, LobbyPlayer, PlayerView, SlotIndex } from "@golf/shared";
+import type {
+  Action,
+  Card,
+  LobbyPlayer,
+  PlayerView,
+  SlotIndex,
+} from "@golf/shared";
 import { Avatar } from "../Avatar";
+import { CardSprite } from "./CardSprite";
 import { Hand } from "./Hand";
 import type { SeatPosition } from "./seats";
 
@@ -11,6 +18,7 @@ export function Seat({
   isViewer,
   isCurrent,
   isDealer,
+  held,
   actions,
   onAct,
 }: {
@@ -21,11 +29,12 @@ export function Seat({
   isViewer: boolean;
   isCurrent: boolean;
   isDealer: boolean;
+  /** The card you have drawn and not yet placed. Only the viewer's seat shows one. */
+  held?: Card | null;
   /** What clicking each of your cards does. Only the viewer's own seat has any. */
   actions?: ReadonlyMap<SlotIndex, Action>;
   onAct?: (action: Action) => void;
 }) {
-  const total = player.holeScores.reduce((sum, s) => sum + s, 0);
   const name = info?.name ?? "Player";
   return (
     <section
@@ -44,15 +53,22 @@ export function Seat({
           {info !== undefined && !info.connected && (
             <span className="tag away">Away</span>
           )}
-          <span>Score {total}</span>
         </span>
       </div>
-      <Hand
-        grid={player.grid}
-        size={isViewer ? "full" : "mini"}
-        actions={actions}
-        onAct={onAct}
-      />
+      <div className="hand-wrap">
+        <Hand
+          grid={player.grid}
+          size={isViewer ? "full" : "mini"}
+          actions={actions}
+          onAct={onAct}
+        />
+        {held != null && (
+          // Floats above your cards so nothing else moves while you hold it.
+          <div className="held" role="group" aria-label="Your drawn card">
+            <CardSprite face={held} size="full" />
+          </div>
+        )}
+      </div>
     </section>
   );
 }

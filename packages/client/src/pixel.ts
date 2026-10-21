@@ -4,13 +4,25 @@ import { useEffect } from "react";
 export const ART_WIDTH = 360;
 
 /**
- * How big one art pixel is, in CSS pixels. It is always a whole number of
- * device pixels, so pixel art never gets blurry or uneven.
+ * The screen height, in art pixels, that the table needs on a wide screen:
+ * four players with the cards drawn at normal size.
  */
-export function pixelSize(cssWidth: number, devicePixelRatio: number): number {
+export const ART_HEIGHT = 400;
+
+/**
+ * How big one art pixel is, in CSS pixels. It is always a whole number of
+ * device pixels, so pixel art never gets blurry or uneven. It is limited by
+ * the height too, so on a wide, short screen the whole table still fits.
+ */
+export function pixelSize(
+  cssWidth: number,
+  devicePixelRatio: number,
+  cssHeight = Infinity,
+): number {
   const ratio = devicePixelRatio > 0 ? devicePixelRatio : 1;
-  const devicePixels = Math.max(1, Math.floor((cssWidth * ratio) / ART_WIDTH));
-  return devicePixels / ratio;
+  const fitWidth = Math.floor((cssWidth * ratio) / ART_WIDTH);
+  const fitHeight = Math.floor((cssHeight * ratio) / ART_HEIGHT);
+  return Math.max(1, Math.min(fitWidth, fitHeight)) / ratio;
 }
 
 /**
@@ -26,7 +38,11 @@ export function handScale(px: number): 1 | 2 {
 export function usePixelScale(): void {
   useEffect(() => {
     const update = () => {
-      const px = pixelSize(window.innerWidth, window.devicePixelRatio);
+      const px = pixelSize(
+        window.innerWidth,
+        window.devicePixelRatio,
+        window.innerHeight,
+      );
       const style = document.documentElement.style;
       style.setProperty("--px", `${px}px`);
       style.setProperty("--hand-scale", String(handScale(px)));

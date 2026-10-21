@@ -80,6 +80,7 @@ input,
 select,
 .banner,
 .avatar-choice,
+.hamburger,
 .portrait {
   border: 0;
   background: var(--paper);
@@ -348,7 +349,15 @@ select:disabled {
   width: 100%;
 }
 
+.topbar {
+  display: flex;
+  align-items: stretch;
+  gap: calc(var(--ui) * 4);
+  width: 100%;
+}
+
 .status {
+  flex: 1;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -487,10 +496,6 @@ select:disabled {
   text-align: center;
 }
 
-.leave {
-  align-self: center;
-}
-
 /* Cards you can click */
 .card-button {
   position: relative;
@@ -536,4 +541,217 @@ select:disabled {
 
 .card-button:active .card {
   translate: 0 calc(var(--px) * 1 * var(--card-scale, 1));
+}
+
+/* Hamburger menu, in the top left */
+.game-menu {
+  position: relative;
+  flex: none;
+}
+
+.hamburger {
+  display: grid;
+  place-items: center;
+  width: max(44px, calc(var(--ui) * 13));
+  height: 100%;
+  min-height: max(44px, calc(var(--ui) * 13));
+  padding: 0;
+  cursor: pointer;
+  background: var(--paper-shade);
+}
+
+.hamburger:focus-visible,
+.menu-item:focus-visible,
+.close:focus-visible {
+  outline: calc(var(--ui) * 1) dashed var(--gold);
+  outline-offset: calc(var(--ui) * 2);
+}
+
+/* Three bars, drawn as one bar and its two shadows. */
+.bars {
+  display: block;
+  width: calc(var(--ui) * 7);
+  height: calc(var(--ui) * 1.5);
+  background: var(--ink);
+  box-shadow:
+    0 calc(var(--ui) * -3) 0 var(--ink),
+    0 calc(var(--ui) * 3) 0 var(--ink);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--ui) * 3);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: calc(var(--ui) * 50);
+  padding: calc(var(--ui) * 1);
+}
+
+.menu-item {
+  min-height: max(44px, calc(var(--ui) * 12));
+  padding: 0 calc(var(--ui) * 4);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--paper-shade);
+}
+
+/* Boxes over the game */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 0.6);
+}
+
+.dialog {
+  position: relative;
+  max-width: 440px;
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 4);
+}
+
+.dialog-title {
+  margin: 0;
+  padding-right: calc(var(--ui) * 14);
+  font-size: calc(var(--ui) * 9);
+}
+
+.dialog-text {
+  margin: 0;
+}
+
+.close {
+  position: absolute;
+  top: calc(var(--ui) * 3);
+  right: calc(var(--ui) * 3);
+  width: max(44px, calc(var(--ui) * 12));
+  height: max(44px, calc(var(--ui) * 12));
+  padding: 0;
+  border: 0;
+  background: var(--danger);
+  color: #fff;
+  font: inherit;
+  font-size: calc(var(--ui) * 8);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.score-scroll {
+  overflow-x: auto;
+}
+
+.scores {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.scores th,
+.scores td {
+  padding: calc(var(--ui) * 1.5) calc(var(--ui) * 2);
+  border-bottom: calc(var(--ui) * 0.5) solid var(--paper-shade);
+}
+
+.scores thead th {
+  vertical-align: bottom;
+}
+
+.scores tfoot th,
+.scores tfoot td {
+  border-top: calc(var(--ui) * 1) solid var(--ink);
+  border-bottom: 0;
+  font-weight: 700;
+}
+
+.score-face {
+  display: block;
+  width: calc(var(--ui) * 16);
+  height: calc(var(--ui) * 16);
+  margin: 0 auto;
+}
+
+.score-name {
+  display: block;
+  max-width: calc(var(--ui) * 30);
+  margin: 0 auto;
+  overflow-wrap: anywhere;
+  font-size: max(14px, calc(var(--ui) * 5));
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The pile someone just took a card from */
+.frame {
+  position: relative;
+}
+
+.selection.on {
+  opacity: 1;
+}
+
+/* The card you drew floats above your cards, so nothing else has to move. */
+.hand-wrap {
+  position: relative;
+}
+
+.held {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + var(--px) * 4 * var(--card-scale, 1));
+  translate: -50% 0;
+  z-index: 10;
+  pointer-events: none;
+  filter: drop-shadow(0 calc(var(--ui) * 2) 0 rgb(0 0 0 / 0.45));
+  outline: calc(var(--ui) * 1) solid var(--gold);
+  outline-offset: calc(var(--ui) * 1);
+}
+
+/*
+ * Where the drawn card floats depends on the room there is:
+ * - Short phones have no space between the piles and your cards for a big
+ *   card, so it is drawn at normal size there.
+ * - On a wide screen there is plenty of room beside your cards, so it sits
+ *   there and covers nothing at all.
+ */
+@media (max-height: 810px) {
+  .held {
+    --card-scale: 1;
+  }
+}
+
+@media (min-width: 720px) {
+  .held {
+    left: calc(100% + var(--px) * 8);
+    bottom: 0;
+    translate: none;
+  }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ART_WIDTH, handScale, pixelSize } from "./pixel";
+import { ART_HEIGHT, ART_WIDTH, handScale, pixelSize } from "./pixel";
 
 describe("pixelSize", () => {
   it("is always a whole number of device pixels", () => {
@@ -28,6 +28,24 @@ describe("pixelSize", () => {
 
   it("never drops below one device pixel", () => {
     expect(pixelSize(100, 1)).toBe(1);
+  });
+});
+
+describe("pixelSize and the height of the screen", () => {
+  it("shrinks on a wide screen that is not tall enough", () => {
+    // 1280 wide would give 3, but 800 tall only has room for 2.
+    expect(pixelSize(1280, 1)).toBe(3);
+    expect(pixelSize(1280, 1, 800)).toBe(2);
+    expect(ART_HEIGHT * pixelSize(1280, 1, 800)).toBeLessThanOrEqual(800);
+  });
+
+  it("leaves a tall phone alone", () => {
+    expect(pixelSize(390, 3, 844)).toBe(pixelSize(390, 3));
+  });
+
+  it("stays a whole number of device pixels", () => {
+    const devicePixels = pixelSize(1920, 1.25, 900) * 1.25;
+    expect(devicePixels).toBeCloseTo(Math.round(devicePixels), 6);
   });
 });
 

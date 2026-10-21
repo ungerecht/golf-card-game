@@ -3,6 +3,8 @@
   --px: 3px;
   /* Interface sizes use this instead, so text and buttons stay usable on phones. */
   --ui: max(var(--px), 2px);
+  /* 2 on a phone, where one art pixel is tiny. See handScale() in pixel.ts. */
+  --hand-scale: 1;
 
   --felt: #1f5c3a;
   --felt-dark: #174a2e;
@@ -322,4 +324,169 @@ select:disabled {
   .avatar-choice {
     width: calc(var(--px) * 128 + var(--ui) * 2);
   }
+}
+
+/* The table */
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 4);
+  width: 100%;
+  min-height: 100dvh;
+  /* The table is laid out for 360 art pixels across. */
+  max-width: calc(var(--px) * 360 + 16px);
+  margin: 0 auto;
+  padding: calc(var(--ui) * 3) 8px calc(var(--ui) * 6);
+}
+
+.table-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 4);
+  width: 100%;
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: calc(var(--ui) * 1) calc(var(--ui) * 4);
+  margin: 0;
+}
+
+.table {
+  flex: 1;
+  display: grid;
+  /* The side seats take what they need, the middle gets the rest. */
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "top top top"
+    "left middle right"
+    "bottom bottom bottom";
+  align-items: center;
+  justify-items: center;
+  gap: calc(var(--ui) * 4);
+}
+
+.seat {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 4);
+  --card-scale: 1;
+  color: var(--paper);
+}
+
+.seat.bottom {
+  grid-area: bottom;
+  --card-scale: var(--hand-scale);
+}
+
+.seat.top {
+  grid-area: top;
+}
+
+.seat.left {
+  grid-area: left;
+  justify-self: start;
+}
+
+.seat.right {
+  grid-area: right;
+  justify-self: end;
+}
+
+/* Side seats are stacked: portrait over cards. */
+.seat.left,
+.seat.right {
+  flex-direction: column;
+  width: calc(var(--px) * 64);
+}
+
+/* With only two players there is room to draw the other hand bigger. */
+.table[data-players="2"] .seat.top {
+  --card-scale: var(--hand-scale);
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 1);
+  width: calc(var(--px) * 64);
+  text-align: center;
+}
+
+.seat-name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  font-size: max(14px, calc(var(--ui) * 5));
+}
+
+.seat-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 calc(var(--ui) * 2);
+  font-size: max(14px, calc(var(--ui) * 5));
+}
+
+.tag.away {
+  background: var(--paper-shade);
+}
+
+.seat.current .portrait {
+  outline: calc(var(--ui) * 2) solid var(--gold);
+  outline-offset: calc(var(--ui) * 1);
+}
+
+.seat.current .seat-name {
+  color: var(--gold);
+}
+
+.hand {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: calc(var(--px) * 2 * var(--card-scale, 1));
+}
+
+.card {
+  display: block;
+}
+
+.card.full {
+  width: calc(var(--px) * 40 * var(--card-scale, 1));
+  height: calc(var(--px) * 56 * var(--card-scale, 1));
+}
+
+.card.mini {
+  width: calc(var(--px) * 20 * var(--card-scale, 1));
+  height: calc(var(--px) * 28 * var(--card-scale, 1));
+}
+
+.piles {
+  grid-area: middle;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--ui) * 4);
+  --card-scale: var(--hand-scale);
+}
+
+.pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 1);
+  margin: 0;
+  color: var(--paper);
+  font-size: max(14px, calc(var(--ui) * 5));
+  text-align: center;
+}
+
+.leave {
+  align-self: center;
 }

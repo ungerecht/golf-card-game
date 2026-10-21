@@ -1,7 +1,8 @@
 import { act, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { DEFAULT_SETTINGS, createGame, getPlayerView } from "@golf/shared";
 import { saveProfile } from "../net/storage";
-import { FakeConnector, lobby, player } from "../test/fakes";
+import { FakeConnector, gameUpdate, lobby, player } from "../test/fakes";
 import { renderApp } from "../test/render";
 
 /** Host a room and wait for the waiting room. */
@@ -188,9 +189,27 @@ describe("starting and leaving", () => {
         started: true,
       }),
     );
+    expect(screen.getByText("Dealing the cards…")).toBeInTheDocument();
+  });
+
+  it("shows the table once the first game update arrives", async () => {
+    const app = await joining();
+    send(
+      app,
+      lobby([player("host", "Ann", "visor"), player("me", "Ben", "teal")], {
+        hostId: "host",
+        started: true,
+      }),
+    );
+    const state = createGame(DEFAULT_SETTINGS, ["host", "me"], () => 0.5);
+    act(() =>
+      app.connector.room.emit("game", gameUpdate(getPlayerView(state, "me"))),
+    );
     expect(
-      screen.getByRole("heading", { name: "Game on" }),
+      screen.getByRole("region", { name: "Ben (you)" }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Ann" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Leave Room" })).toBeEnabled();
   });
 
   it("goes to the landing page when someone leaves the room", async () => {

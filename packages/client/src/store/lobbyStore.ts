@@ -2,6 +2,7 @@
 // the store and call its actions. Only this file talks to the connector.
 import { createStore } from "zustand/vanilla";
 import {
+  type Action,
   type AvatarId,
   type GameSettings,
   type GameUpdate,
@@ -33,6 +34,8 @@ export interface LobbyState {
   resume(code: string): Promise<boolean>;
   ready(name: string, avatar: AvatarId): void;
   start(): void;
+  /** Play a move. The table updates when the server answers. */
+  act(action: Action): void;
   leave(): Promise<void>;
   dismissError(): void;
   dismissNotice(): void;
@@ -159,6 +162,11 @@ export function createLobbyStore(connector: Connector) {
       start() {
         set({ error: null });
         room?.send("start");
+      },
+
+      act(action) {
+        set({ error: null });
+        room?.send("action", action);
       },
 
       async leave() {

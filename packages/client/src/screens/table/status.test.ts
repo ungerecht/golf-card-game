@@ -56,6 +56,31 @@ describe("statusText", () => {
     );
   });
 
+  it("only offers drawing once every card is face up", () => {
+    const state = game();
+    const players = state.players.map((p, i) =>
+      i === 0
+        ? {
+            ...p,
+            grid: p.grid.map((c) => ({
+              ...c,
+              faceUp: true,
+            })) as unknown as typeof p.grid,
+          }
+        : p,
+    );
+    const view = getPlayerView(
+      {
+        ...state,
+        players,
+        phase: { type: "flipOrDraw" },
+        currentPlayerIndex: 0,
+      },
+      "a",
+    );
+    expect(statusText(view, nameOf)).toBe("Your turn: draw a card");
+  });
+
   it("only offers to discard a card from the draw pile", () => {
     const base = game();
     const card = base.deck.at(-1)!;

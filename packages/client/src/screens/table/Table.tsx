@@ -1,19 +1,24 @@
-import type { GameView, LobbySnapshot } from "@golf/shared";
+import type { Action, GameView, LobbySnapshot } from "@golf/shared";
 import { Piles } from "./Piles";
 import { Seat } from "./Seat";
 import { arrangeSeats } from "./seats";
 import { statusText } from "./status";
+import { clickTargets } from "./targets";
 
 /** The whole table, as one player sees it: them at the bottom, the piles in the middle. */
 export function Table({
   view,
   lobby,
+  onAct,
 }: {
   view: GameView;
   lobby: LobbySnapshot;
+  /** Called with the action a click asks for. */
+  onAct: (action: Action) => void;
 }) {
   const info = new Map(lobby.players.map((p) => [p.id, p]));
   const nameOf = (id: string) => info.get(id)?.name ?? "Player";
+  const targets = clickTargets(view);
   const seats = arrangeSeats(view.players, view.viewerId);
 
   return (
@@ -34,9 +39,16 @@ export function Table({
             isViewer={player.id === view.viewerId}
             isCurrent={player.id === view.currentPlayerId}
             isDealer={player.id === view.dealerId}
+            actions={player.id === view.viewerId ? targets.slots : undefined}
+            onAct={onAct}
           />
         ))}
-        <Piles view={view} holderName={nameOf(view.currentPlayerId)} />
+        <Piles
+          view={view}
+          holderName={nameOf(view.currentPlayerId)}
+          targets={targets}
+          onAct={onAct}
+        />
       </div>
     </div>
   );

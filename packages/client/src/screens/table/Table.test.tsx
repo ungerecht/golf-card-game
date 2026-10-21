@@ -1,5 +1,6 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_SETTINGS,
   createGame,
@@ -29,7 +30,11 @@ function setup(
     ),
     { started: true },
   );
-  render(<Table view={getPlayerView(game, viewer)} lobby={snapshot} />);
+  const onAct = vi.fn();
+  render(
+    <Table view={getPlayerView(game, viewer)} lobby={snapshot} onAct={onAct} />,
+  );
+  return onAct;
 }
 
 const seat = (name: string) => screen.getByRole("region", { name });
@@ -126,5 +131,72 @@ describe("Table", () => {
   it("shows a spectator the first player at the bottom", () => {
     setup(2, null);
     expect(seat("Ann")).toHaveClass("bottom");
+  });
+
+  describe("clicking", () => {
+    it("flips a card with a click during the first flips", async () => {
+      const onAct = setup(2, "p1");
+      await userEvent.click(
+        screen.getByRole("button", { name: "Flip your top middle card" }),
+      );
+      expect(onAct).toHaveBeenCalledWith({ type: "flipInitial", slot: 1 });
+    });
+
+    it("never makes other players' cards or the piles clickable then", () => {
+      setup(3, "p1");
+      expect(screen.getAllByRole("button")).toHaveLength(6);
+      expect(within(seat("Ben")).queryByRole("button")).not.toBeInTheDocument();
+    });
+
+    it("draws from either pile on your turn", async () => {
+      const onAct = setup(2, "p2", {
+        phase: { type: "flipOrDraw" },
+        currentPlayerIndex: 1,
+      });
+      await userEvent.click(
+        screen.getByRole("button", { name: "Draw from the deck" }),
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Take the top discard" }),
+      );
+      expect(onAct.mock.calls).toEqual([
+        [{ type: "drawFromDeck" }],
+        [{ type: "drawFromDiscard" }],
+      ]);
+    });
+
+    it("swaps or discards the card you drew", async () => {
+      const base = createGame(DEFAULT_SETTINGS, ["p1", "p2"], () => 0.3);
+      const onAct = setup(2, "p1", {
+        deck: base.deck.slice(0, -1),
+        currentPlayerIndex: 0,
+        phase: { type: "place", drawn: base.deck.at(-1)!, source: "deck" },
+      });
+      await userEvent.click(
+        screen.getByRole("button", { name: "Swap into your bottom left card" }),
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: "Discard the card you drew" }),
+      );
+      expect(onAct.mock.calls).toEqual([
+        [{ type: "swapDrawn", slot: 3 }],
+        [{ type: "discardDrawn" }],
+      ]);
+    });
+
+    it("lets you press a card with the keyboard", async () => {
+      const onAct = setup(2, "p1");
+      await userEvent.tab();
+      await userEvent.keyboard("{Enter}");
+      expect(onAct).toHaveBeenCalledWith({ type: "flipInitial", slot: 0 });
+    });
+
+    it("makes nothing clickable when you have to wait", () => {
+      setup(2, "p1", {
+        phase: { type: "flipOrDraw" },
+        currentPlayerIndex: 1,
+      });
+      expect(screen.queryAllByRole("button")).toHaveLength(0);
+    });
   });
 });

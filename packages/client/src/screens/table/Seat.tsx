@@ -1,4 +1,4 @@
-import type { LobbyPlayer, PlayerView } from "@golf/shared";
+import type { Action, LobbyPlayer, PlayerView, SlotIndex } from "@golf/shared";
 import { Avatar } from "../Avatar";
 import { Hand } from "./Hand";
 import type { SeatPosition } from "./seats";
@@ -11,6 +11,8 @@ export function Seat({
   isViewer,
   isCurrent,
   isDealer,
+  actions,
+  onAct,
 }: {
   position: SeatPosition;
   player: PlayerView;
@@ -19,6 +21,9 @@ export function Seat({
   isViewer: boolean;
   isCurrent: boolean;
   isDealer: boolean;
+  /** What clicking each of your cards does. Only the viewer's own seat has any. */
+  actions?: ReadonlyMap<SlotIndex, Action>;
+  onAct?: (action: Action) => void;
 }) {
   const total = player.holeScores.reduce((sum, s) => sum + s, 0);
   const name = info?.name ?? "Player";
@@ -42,7 +47,12 @@ export function Seat({
           <span>Score {total}</span>
         </span>
       </div>
-      <Hand grid={player.grid} size={isViewer ? "full" : "mini"} />
+      <Hand
+        grid={player.grid}
+        size={isViewer ? "full" : "mini"}
+        actions={actions}
+        onAct={onAct}
+      />
     </section>
   );
 }

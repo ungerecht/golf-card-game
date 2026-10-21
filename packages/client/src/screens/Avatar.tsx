@@ -10,6 +10,7 @@ export function Avatar({ id, grey = false }: { id: AvatarId; grey?: boolean }) {
       alt={AVATAR_LABELS[id]}
       width={64}
       height={64}
+      decoding="sync"
       draggable={false}
     />
   );

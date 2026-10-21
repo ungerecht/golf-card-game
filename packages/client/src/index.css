@@ -490,3 +490,50 @@ select:disabled {
 .leave {
   align-self: center;
 }
+
+/* Cards you can click */
+.card-button {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.card-button:disabled {
+  cursor: default;
+}
+
+/* The outline art is one art pixel bigger than the card on every side. */
+.selection {
+  position: absolute;
+  left: calc(var(--px) * -1 * var(--card-scale, 1));
+  top: calc(var(--px) * -1 * var(--card-scale, 1));
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.selection.full {
+  width: calc(var(--px) * 42 * var(--card-scale, 1));
+  height: calc(var(--px) * 58 * var(--card-scale, 1));
+}
+
+.selection.mini {
+  width: calc(var(--px) * 22 * var(--card-scale, 1));
+  height: calc(var(--px) * 30 * var(--card-scale, 1));
+}
+
+.card-button:hover .selection,
+.card-button:focus-visible .selection {
+  opacity: 1;
+}
+
+.card-button:focus-visible {
+  outline: none;
+}
+
+.card-button:active .card {
+  translate: 0 calc(var(--px) * 1 * var(--card-scale, 1));
+}

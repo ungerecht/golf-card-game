@@ -212,6 +212,44 @@ describe("starting and leaving", () => {
     expect(screen.getByRole("button", { name: "Leave Room" })).toBeEnabled();
   });
 
+  it("sends the move you click to the server", async () => {
+    const app = await joining();
+    send(
+      app,
+      lobby([player("host", "Ann", "visor"), player("me", "Ben", "teal")], {
+        hostId: "host",
+        started: true,
+      }),
+    );
+    const state = createGame(DEFAULT_SETTINGS, ["host", "me"], () => 0.5);
+    act(() =>
+      app.connector.room.emit("game", gameUpdate(getPlayerView(state, "me"))),
+    );
+    await app.user.click(
+      screen.getByRole("button", { name: "Flip your bottom right card" }),
+    );
+    expect(app.connector.room.sentOfType("action")).toEqual([
+      { type: "flipInitial", slot: 5 },
+    ]);
+  });
+
+  it("tells you when the server refuses a move", async () => {
+    const app = await joining();
+    send(
+      app,
+      lobby([player("host", "Ann", "visor"), player("me", "Ben", "teal")], {
+        hostId: "host",
+        started: true,
+      }),
+    );
+    const state = createGame(DEFAULT_SETTINGS, ["host", "me"], () => 0.5);
+    act(() =>
+      app.connector.room.emit("game", gameUpdate(getPlayerView(state, "me"))),
+    );
+    act(() => app.connector.room.emit("error", { code: "NOT_YOUR_TURN" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("not your turn");
+  });
+
   it("goes to the landing page when someone leaves the room", async () => {
     const app = await joining();
     send(app, lobby([player("me", "Ben", "teal")], { hostId: "host" }));

@@ -18,8 +18,14 @@ export function statusText(
         ? `Flip ${phase.flipsRequired - flipped} of your cards`
         : "Waiting for everyone to flip";
     }
-    case "flipOrDraw":
-      return mine ? "Your turn: flip a card or draw" : `${current}'s turn`;
+    case "flipOrDraw": {
+      if (!mine) return `${current}'s turn`;
+      // On the last turns after someone goes out, every card may be face up already.
+      const canFlip = view.legalActions.some((a) => a.type === "flip");
+      return canFlip
+        ? "Your turn: flip a card or draw"
+        : "Your turn: draw a card";
+    }
     case "place":
       if (!mine) return `${current} is placing a card`;
       // Only a card from the draw pile can be thrown away again.

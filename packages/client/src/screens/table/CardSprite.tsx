@@ -21,6 +21,12 @@ export function CardSprite({ face, size }: { face: CardFace; size: CardSize }) {
         ? [emptySlotUrl(size), "Empty spot"]
         : [cardUrl(face, size), cardLabel(face)];
   return (
-    <img className={`card ${size}`} src={src} alt={alt} draggable={false} />
+    <img
+      className={`card ${size}`}
+      src={src}
+      alt={alt}
+      decoding="sync"
+      draggable={false}
+    />
   );
 }

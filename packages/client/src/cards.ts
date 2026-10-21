@@ -81,3 +81,8 @@ export function cardLabel(card: Card): string {
 
 /** How many card images there are in all, so a test can spot a stray or missing file. */
 export const CARD_IMAGE_COUNT = Object.keys(sprites).length;
+
+/** The URL of every card image, for preloading. */
+export function allCardUrls(): string[] {
+  return Object.values(sprites);
+}

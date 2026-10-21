@@ -14,6 +14,11 @@ export function avatarUrl(id: AvatarId): string {
   return url;
 }
 
+/** The URL of every portrait, for preloading. */
+export function allAvatarUrls(): string[] {
+  return Object.values(portraits);
+}
+
 /** Human-friendly names, for alt text and tooltips. */
 export const AVATAR_LABELS: Record<AvatarId, string> = {
   visor: "Visor",

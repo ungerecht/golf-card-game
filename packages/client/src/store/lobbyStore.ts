@@ -21,6 +21,8 @@ export interface LobbyState {
   readonly myId: string | null;
   readonly lobby: LobbySnapshot | null;
   readonly game: GameUpdate | null;
+  /** When `game` arrived, as `Date.now()` here, to work out the countdowns. */
+  readonly gameAt: number | null;
   /** The latest refusal from the server, for the screen to show. */
   readonly error: RoomErrorCode | null;
   /** Why we ended up back at the start, shown once on the landing page. */
@@ -34,6 +36,8 @@ export interface LobbyState {
   resume(code: string): Promise<boolean>;
   ready(name: string, avatar: AvatarId): void;
   start(): void;
+  /** After a game is over, the host starts another one. */
+  playAgain(): void;
   /** Play a move. The table updates when the server answers. */
   act(action: Action): void;
   leave(): Promise<void>;
@@ -47,6 +51,7 @@ const IDLE = {
   myId: null,
   lobby: null,
   game: null,
+  gameAt: null,
   error: null,
 } as const;
 
@@ -78,6 +83,7 @@ export function createLobbyStore(connector: Connector) {
         myId: handle.sessionId,
         lobby: null,
         game: null,
+        gameAt: null,
         error: null,
         notice: null,
       });
@@ -85,7 +91,7 @@ export function createLobbyStore(connector: Connector) {
         if (room === handle) set({ lobby });
       });
       handle.on("game", (game) => {
-        if (room === handle) set({ game });
+        if (room === handle) set({ game, gameAt: Date.now() });
       });
       handle.on("error", ({ code }) => {
         if (room === handle) set({ error: code });
@@ -162,6 +168,11 @@ export function createLobbyStore(connector: Connector) {
       start() {
         set({ error: null });
         room?.send("start");
+      },
+
+      playAgain() {
+        set({ error: null });
+        room?.send("playAgain");
       },
 
       act(action) {

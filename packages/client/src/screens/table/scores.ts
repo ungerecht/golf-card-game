@@ -1,5 +1,10 @@
-import { totalScore, type AvatarId, type GameView } from "@golf/shared";
-import type { LobbySnapshot } from "@golf/shared";
+import {
+  totalScore,
+  type AvatarId,
+  type GameResult,
+  type GameView,
+  type LobbySnapshot,
+} from "@golf/shared";
 
 /** One column of the score sheet. */
 export interface ScoreColumn {
@@ -28,4 +33,34 @@ export function scoreColumns(
       total: totalScore(player),
     };
   });
+}
+
+/** The final scores, best first, as columns for the score table. */
+export function resultColumns(
+  result: GameResult,
+  viewerId: string | null,
+): ScoreColumn[] {
+  return result.scoresheet.map((row) => ({
+    playerId: row.playerId,
+    name: row.name,
+    avatar: row.avatar,
+    isViewer: row.playerId === viewerId,
+    holeScores: row.holeScores,
+    total: row.total,
+  }));
+}
+
+/** "You win!", "Ann wins!" or "Ann and Bo tie!" */
+export function winnerText(
+  result: GameResult,
+  viewerId: string | null,
+): string {
+  const { winners } = result;
+  const [only] = winners;
+  if (winners.length === 1 && only !== undefined) {
+    return only.playerId === viewerId ? "You win!" : `${only.name} wins!`;
+  }
+  const names = winners.map((w) => w.name);
+  const last = names.pop();
+  return `${names.length > 0 ? `${names.join(", ")} and ` : ""}${last ?? "Nobody"} tie!`;
 }

@@ -4,6 +4,7 @@ import { Client, type Room } from "@colyseus/sdk";
 import type { Server } from "colyseus";
 import {
   ROOM_NAME,
+  type ChatMessage,
   type GameUpdate,
   type LobbySnapshot,
   type RoomClosed,
@@ -31,12 +32,18 @@ class Player {
   game: GameUpdate[] = [];
   errors: RoomError[] = [];
   closed: RoomClosed[] = [];
+  chat: ChatMessage[] = [];
+  chatHistory: ChatMessage[][] = [];
 
   constructor(readonly room: Room) {
     room.onMessage("lobby", (m: LobbySnapshot) => this.lobby.push(m));
     room.onMessage("game", (m: GameUpdate) => this.game.push(m));
     room.onMessage("error", (m: RoomError) => this.errors.push(m));
     room.onMessage("closed", (m: RoomClosed) => this.closed.push(m));
+    room.onMessage("chat", (m: ChatMessage) => this.chat.push(m));
+    room.onMessage("chatHistory", (m: { messages: ChatMessage[] }) =>
+      this.chatHistory.push(m.messages),
+    );
   }
 
   /** Claim a seat, and wait until the server has shown us in the roster. */
@@ -464,6 +471,46 @@ describe("playing a game", () => {
     );
 
     await back.room.leave();
+    await ann.room.leave();
+  });
+});
+
+describe("room chat", () => {
+  it("carries messages between players and trims them", async () => {
+    const ann = await host({ maxPlayers: 3 });
+    const ben = await join(ann.room.roomId, "Ben");
+    ann.room.send("chat", { text: "  hi Ben  " });
+    await until(() => ben.chat.length === 1, "Ben to hear Ann");
+    expect(ben.chat[0]).toMatchObject({ name: "Ann", text: "hi Ben" });
+    expect(ann.chat).toHaveLength(1);
+
+    const cy = await join(ann.room.roomId, "Cy", "lavender");
+    await until(() => cy.chatHistory.length > 0, "Cy to get the history");
+    expect(cy.chatHistory.at(-1)?.map((m) => m.text)).toEqual(["hi Ben"]);
+    for (const p of [ben, cy, ann]) await p.room.leave();
+  });
+
+  it("refuses empty, long and multi-line messages", async () => {
+    const ann = await host();
+    await join(ann.room.roomId, "Ben");
+    for (const text of ["   ", "x".repeat(201), "two\nlines", 42, undefined]) {
+      ann.room.send("chat", { text });
+    }
+    ann.room.send("chat", "not an object");
+    await until(() => ann.errors.length === 6, "six refusals");
+    expect(ann.errors.every((e) => e.code === "BAD_MESSAGE")).toBe(true);
+    expect(ann.chat).toHaveLength(0);
+    await ann.room.leave();
+  });
+
+  it("does not let someone without a seat speak", async () => {
+    const ann = await host();
+    const lurker = await connect(ann.room.roomId);
+    lurker.room.send("chat", { text: "hello?" });
+    await until(() => lurker.errors.length === 1, "a refusal");
+    expect(lurker.errors[0]?.code).toBe("NOT_READY");
+    expect(ann.chat).toHaveLength(0);
+    await lurker.room.leave();
     await ann.room.leave();
   });
 });

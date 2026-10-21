@@ -8,6 +8,7 @@ import {
 import {
   ActionSchema,
   CLIENT_MESSAGE,
+  ChatPayloadSchema,
   CreateOptionsSchema,
   ReadyPayloadSchema,
   type CreateOptions,
@@ -98,6 +99,15 @@ export class GolfRoom extends Room {
 
     this.onMessage(CLIENT_MESSAGE.playAgain, (client) => {
       this.#session.playAgain(client.sessionId);
+    });
+
+    this.onMessage(CLIENT_MESSAGE.chat, (client, raw: unknown) => {
+      const payload = ChatPayloadSchema.safeParse(raw);
+      if (!payload.success) {
+        this.#send(client.sessionId, "error", { code: "BAD_MESSAGE" });
+        return;
+      }
+      this.#session.chat(client.sessionId, payload.data.text);
     });
 
     this.onMessage(CLIENT_MESSAGE.action, (client, raw: unknown) => {

@@ -159,3 +159,83 @@ describe("in the room", () => {
     expect(store.getState().lobby).toBeNull();
   });
 });
+
+describe("chat", () => {
+  const said = (id: number, text: string, playerId = "host") => ({
+    id,
+    playerId,
+    name: playerId === "host" ? "Ann" : "Ben",
+    avatar: "visor" as const,
+    text,
+    at: id * 1000,
+  });
+
+  async function inRoom() {
+    const store = createLobbyStore(connector);
+    await store.getState().joinRoom("ABCDE");
+    return store;
+  }
+
+  it("collects messages in order, skipping any it already has", async () => {
+    const store = await inRoom();
+    connector.room.emit("chat", said(2, "two"));
+    connector.room.emit("chatHistory", {
+      messages: [said(1, "one"), said(2, "two")],
+    });
+    connector.room.emit("chat", said(3, "three"));
+    connector.room.emit("chat", said(3, "three"));
+    expect(store.getState().chat.map((m) => m.text)).toEqual([
+      "one",
+      "two",
+      "three",
+    ]);
+  });
+
+  it("sends what you type and clears the too-fast warning", async () => {
+    const store = await inRoom();
+    connector.room.emit("error", { code: "CHAT_TOO_FAST" });
+    expect(store.getState().chatTooFast).toBe(true);
+    // It is not a table error.
+    expect(store.getState().error).toBeNull();
+
+    store.getState().sendChat("hello");
+    expect(connector.room.sentOfType("chat")).toEqual([{ text: "hello" }]);
+    expect(store.getState().chatTooFast).toBe(false);
+  });
+
+  it("forgets the chat on leaving", async () => {
+    const store = await inRoom();
+    connector.room.emit("chat", said(1, "one"));
+    await store.getState().leave();
+    expect(store.getState().chat).toEqual([]);
+  });
+});
+
+describe("chat box", () => {
+  it("marks messages read when it is closed, and keeps the draft", async () => {
+    const store = createLobbyStore(connector);
+    await store.getState().joinRoom("ABCDE");
+    const say = (id: number) =>
+      connector.room.emit("chat", {
+        id,
+        playerId: "host",
+        name: "Ann",
+        avatar: "visor",
+        text: `m${id}`,
+        at: id,
+      });
+    say(1);
+    store.getState().setChatOpen(true);
+    say(2);
+    expect(store.getState().chatRead).toBe(0);
+    store.getState().setChatDraft("half a thought");
+    store.getState().setChatOpen(false);
+    expect(store.getState()).toMatchObject({
+      chatOpen: false,
+      chatRead: 2,
+      chatDraft: "half a thought",
+    });
+    store.getState().sendChat("sent");
+    expect(store.getState().chatDraft).toBe("");
+  });
+});

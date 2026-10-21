@@ -14,6 +14,7 @@ export function Table({
   onAct,
   onLeave,
   banner,
+  chat,
 }: {
   view: GameView;
   lobby: LobbySnapshot;
@@ -23,6 +24,8 @@ export function Table({
   onLeave: () => void;
   /** Something to show under the status bar, like a way back to the results. */
   banner?: ReactNode;
+  /** Room chat, shown under the status bar. */
+  chat?: ReactNode;
 }) {
   const info = new Map(lobby.players.map((p) => [p.id, p]));
   const nameOf = (id: string) => info.get(id)?.name ?? "Player";
@@ -40,6 +43,7 @@ export function Table({
           <strong>{statusText(view, nameOf)}</strong>
         </p>
       </div>
+      {chat}
       {banner}
       <div className="table" data-players={view.players.length}>
         {seats.map(({ position, player }) => (

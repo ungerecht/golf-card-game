@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useLobby } from "../store/useLobby";
+import { Chat } from "./chat/Chat";
 import { errorText } from "./errors";
 import { GameOver } from "./table/GameOver";
 import { HoleSummary, ResultsBar } from "./table/HoleSummary";
@@ -33,6 +34,7 @@ export function GameRoom() {
         <button type="button" className="button" onClick={leaveRoom}>
           Leave Room
         </button>
+        <Chat />
         {errorBanner}
       </main>
     );
@@ -50,6 +52,7 @@ export function GameRoom() {
           onPlayAgain={playAgain}
           onLeave={leaveRoom}
         />
+        <Chat />
         {errorBanner}
       </main>
     );
@@ -66,6 +69,7 @@ export function GameRoom() {
         lobby={lobby}
         onAct={act}
         onLeave={leaveRoom}
+        chat={<Chat />}
         banner={
           holeOver && summaryClosed ? (
             <ResultsBar

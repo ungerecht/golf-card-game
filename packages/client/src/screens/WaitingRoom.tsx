@@ -12,6 +12,7 @@ import { useLobby } from "../store/useLobby";
 import { Avatar } from "./Avatar";
 import { GameRoom } from "./GameRoom";
 import { errorText } from "./errors";
+import { Chat } from "./chat/Chat";
 
 export function WaitingRoom() {
   const navigate = useNavigate();
@@ -169,6 +170,8 @@ export function WaitingRoom() {
       {isHost && seated && !canStart && (
         <p className="hint">Waiting for at least one more player…</p>
       )}
+
+      {seated && <Chat />}
 
       <div className="row">
         <button

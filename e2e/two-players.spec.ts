@@ -19,6 +19,17 @@ async function takeTurnIfAny(page: Page): Promise<void> {
   }
 }
 
+/** Say something through the chat box, then close it again. */
+async function say(page: Page, text: string): Promise<void> {
+  await page.getByRole("button", { name: /^Open chat/ }).click();
+  await page.getByLabel("Your message").fill(text);
+  await page.getByLabel("Your message").press("Enter");
+  await page.getByRole("button", { name: "Close chat" }).click();
+}
+
+const chatBar = (page: Page) =>
+  page.getByRole("button", { name: /^Open chat/ });
+
 async function joinTable(
   page: Page,
   name: string,
@@ -67,9 +78,19 @@ test("a host and a guest play a whole game together", async ({ browser }) => {
   await expect(guest.getByRole("button", { name: "Start Game" })).toHaveCount(
     0,
   );
+  // They can talk in the waiting room, and the bar shows the latest message.
+  await say(guest, "hello host");
+  await expect(chatBar(host)).toContainText("Guesty: hello host");
+  await expect(chatBar(host)).toContainText("1 unread");
+
   await host.getByRole("button", { name: "Start Game" }).click();
   await expect(host.getByRole("group", { name: "Piles" })).toBeVisible();
   await expect(guest.getByRole("group", { name: "Piles" })).toBeVisible();
+
+  // The chat carries over to the table.
+  await expect(chatBar(guest)).toContainText("Guesty: hello host");
+  await say(host, "good luck");
+  await expect(chatBar(guest)).toContainText("Hosty: good luck");
 
   // Both play until the game ends. The host starts each following hole.
   const gameOver = (page: Page) =>

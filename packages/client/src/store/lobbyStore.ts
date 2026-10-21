@@ -4,6 +4,7 @@ import { createStore } from "zustand/vanilla";
 import {
   type Action,
   type AvatarId,
+  type ChatMessage,
   type GameSettings,
   type GameUpdate,
   type LobbySnapshot,
@@ -11,6 +12,7 @@ import {
   type RoomErrorCode,
 } from "@golf/shared";
 import type { Connector, RoomHandle } from "../net/types";
+import { mergeChat } from "./chat";
 import { clearSession, loadSession, saveSession } from "../net/storage";
 
 export interface LobbyState {
@@ -23,6 +25,17 @@ export interface LobbyState {
   readonly game: GameUpdate | null;
   /** When `game` arrived, as `Date.now()` here, to work out the countdowns. */
   readonly gameAt: number | null;
+  /** Room chat so far, oldest first. */
+  readonly chat: readonly ChatMessage[];
+  /** Set when the server says we are sending chat messages too fast. */
+  readonly chatTooFast: boolean;
+  /**
+   * Whether the chat box is open, what is typed in it, and the newest message
+   * read. Kept here so they survive the waiting room turning into the table.
+   */
+  readonly chatOpen: boolean;
+  readonly chatDraft: string;
+  readonly chatRead: number;
   /** The latest refusal from the server, for the screen to show. */
   readonly error: RoomErrorCode | null;
   /** Why we ended up back at the start, shown once on the landing page. */
@@ -36,6 +49,11 @@ export interface LobbyState {
   resume(code: string): Promise<boolean>;
   ready(name: string, avatar: AvatarId): void;
   start(): void;
+  /** Say something to the room. */
+  sendChat(text: string): void;
+  /** Open or close the chat box. Closing it marks everything as read. */
+  setChatOpen(open: boolean): void;
+  setChatDraft(text: string): void;
   /** After a game is over, the host starts another one. */
   playAgain(): void;
   /** Play a move. The table updates when the server answers. */
@@ -52,6 +70,11 @@ const IDLE = {
   lobby: null,
   game: null,
   gameAt: null,
+  chat: [],
+  chatTooFast: false,
+  chatOpen: false,
+  chatDraft: "",
+  chatRead: 0,
   error: null,
 } as const;
 
@@ -84,6 +107,11 @@ export function createLobbyStore(connector: Connector) {
         lobby: null,
         game: null,
         gameAt: null,
+        chat: [],
+        chatTooFast: false,
+        chatOpen: false,
+        chatDraft: "",
+        chatRead: 0,
         error: null,
         notice: null,
       });
@@ -93,8 +121,17 @@ export function createLobbyStore(connector: Connector) {
       handle.on("game", (game) => {
         if (room === handle) set({ game, gameAt: Date.now() });
       });
+      handle.on("chat", (message) => {
+        if (room === handle) set({ chat: mergeChat(get().chat, [message]) });
+      });
+      handle.on("chatHistory", ({ messages }) => {
+        if (room === handle) set({ chat: mergeChat(get().chat, messages) });
+      });
       handle.on("error", ({ code }) => {
-        if (room === handle) set({ error: code });
+        if (room !== handle) return;
+        // Chat has its own spot on screen, so it must not look like a table error.
+        if (code === "CHAT_TOO_FAST") set({ chatTooFast: true });
+        else set({ error: code });
       });
       handle.on("closed", ({ reason }) => {
         if (room === handle) closedReason = reason;
@@ -169,6 +206,18 @@ export function createLobbyStore(connector: Connector) {
         set({ error: null });
         room?.send("start");
       },
+
+      sendChat(text) {
+        set({ chatTooFast: false, chatDraft: "" });
+        room?.send("chat", { text });
+      },
+
+      setChatOpen(open) {
+        if (open) return set({ chatOpen: true });
+        set({ chatOpen: false, chatRead: get().chat.at(-1)?.id ?? 0 });
+      },
+
+      setChatDraft: (text) => set({ chatDraft: text }),
 
       playAgain() {
         set({ error: null });

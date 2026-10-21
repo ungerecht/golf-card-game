@@ -3,6 +3,7 @@
 // around this, which keeps it easy to test without sockets.
 import {
   AVATAR_IDS,
+  CHAT_HISTORY_LIMIT,
   applyAction,
   buildGameResult,
   chooseAction,
@@ -11,6 +12,7 @@ import {
   getPlayerView,
   type Action,
   type AvatarId,
+  type ChatMessage,
   type GameEvent,
   type GameResult,
   type GameSettings,
@@ -70,6 +72,9 @@ export const DEFAULT_BOT_DELAY_MS = 900;
 export const DEFAULT_RECONNECT_GRACE_MS = 2 * 60 * 1000;
 export const DEFAULT_NEXT_HOLE_DELAY_MS = 30 * 1000;
 export const DEFAULT_READY_TIMEOUT_MS = 60 * 1000;
+/** Each player may send this many chat messages in any window of this length. */
+export const CHAT_BURST = 5;
+export const CHAT_WINDOW_MS = 10 * 1000;
 
 export class GameSession {
   readonly #options: SessionOptions;
@@ -84,6 +89,10 @@ export class GameSession {
   /** The final scoresheet, written down the moment the game ends. */
   #result: GameResult | null = null;
   #disposed = false;
+  readonly #chat: ChatMessage[] = [];
+  #lastChatId = 0;
+  /** When each player recently spoke, to slow down floods. */
+  readonly #spoke = new Map<PlayerId, number[]>();
 
   constructor(options: SessionOptions) {
     this.#options = options;
@@ -168,6 +177,41 @@ export class GameSession {
     if (id === this.#hostId) this.#seats.unshift(seat);
     else this.#seats.push(seat);
     this.#changed();
+    this.#sendChatHistory(id);
+  }
+
+  /** A seated player says something to everyone at the table. */
+  chat(id: PlayerId, text: string): void {
+    const seat = this.#seat(id);
+    if (seat === undefined || seat.isBot) return this.#fail(id, "NOT_READY");
+    const now = Date.now();
+    const recent = (this.#spoke.get(id) ?? []).filter(
+      (at) => now - at < CHAT_WINDOW_MS,
+    );
+    if (recent.length >= CHAT_BURST) {
+      this.#spoke.set(id, recent);
+      return this.#fail(id, "CHAT_TOO_FAST");
+    }
+    this.#spoke.set(id, [...recent, now]);
+
+    this.#lastChatId += 1;
+    const message: ChatMessage = {
+      id: this.#lastChatId,
+      playerId: id,
+      name: seat.name,
+      avatar: seat.avatar,
+      text,
+      at: now,
+    };
+    this.#chat.push(message);
+    if (this.#chat.length > CHAT_HISTORY_LIMIT) this.#chat.shift();
+    for (const other of this.#seats) {
+      if (!other.isBot) this.#options.send(other.id, "chat", message);
+    }
+  }
+
+  #sendChatHistory(id: PlayerId): void {
+    this.#options.send(id, "chatHistory", { messages: [...this.#chat] });
   }
 
   /**
@@ -217,12 +261,14 @@ export class GameSession {
     this.#clearGrace(seat);
     this.#changed();
     this.#sendGame(id, []);
+    this.#sendChatHistory(id);
   }
 
   /** Send the current lobby, and the game if it has started, to one player. */
   sync(id: PlayerId): void {
     this.#options.send(id, "lobby", this.snapshot());
     this.#sendGame(id, []);
+    if (this.#seat(id) !== undefined) this.#sendChatHistory(id);
   }
 
   /** The host starts the game, filling empty seats with bots if that is switched on. */

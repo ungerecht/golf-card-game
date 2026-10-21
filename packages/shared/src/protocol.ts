@@ -42,6 +42,22 @@ export const ReadyPayloadSchema = z.object({
 });
 export type ReadyPayload = z.infer<typeof ReadyPayloadSchema>;
 
+export const CHAT_MESSAGE_MAX_LENGTH = 200;
+/** How many messages the room remembers for people who join or come back. */
+export const CHAT_HISTORY_LIMIT = 100;
+
+/** 1 to 200 characters once trimmed, on one line. */
+export const ChatTextSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(CHAT_MESSAGE_MAX_LENGTH)
+  .regex(/^[^\p{Cc}]+$/u);
+
+/** What a player sends to say something in the room. */
+export const ChatPayloadSchema = z.object({ text: ChatTextSchema });
+export type ChatPayload = z.infer<typeof ChatPayloadSchema>;
+
 /** What the host sends when creating a room. Missing settings get their defaults. */
 export const CreateOptionsSchema = z.object({
   settings: GameSettingsSchema.default(DEFAULT_SETTINGS),
@@ -66,6 +82,8 @@ export const CLIENT_MESSAGE = {
   playAgain: "playAgain",
   /** Play an action. The payload is an `Action`. */
   action: "action",
+  /** Say something to the room. The payload is a `ChatPayload`. */
+  chat: "chat",
 } as const;
 
 export { ActionSchema };
@@ -123,6 +141,19 @@ export interface GameResult {
   readonly winners: readonly ScoreRow[];
 }
 
+/** One line of room chat. */
+export interface ChatMessage {
+  /** Counts up from 1 in each room, so a client can skip any it already has. */
+  readonly id: number;
+  readonly playerId: PlayerId;
+  /** The sender's name and avatar when they spoke. */
+  readonly name: string;
+  readonly avatar: AvatarId;
+  readonly text: string;
+  /** Milliseconds since 1970 on the server's clock. */
+  readonly at: number;
+}
+
 /** The latest state of the game for one player, plus what just happened. */
 export interface GameUpdate {
   readonly view: GameView;
@@ -151,7 +182,8 @@ export type RoomErrorCode =
   | "NOT_READY"
   | "ALREADY_READY"
   | "AVATAR_TAKEN"
-  | "BAD_MESSAGE";
+  | "BAD_MESSAGE"
+  | "CHAT_TOO_FAST";
 
 export interface RoomError {
   readonly code: RoomErrorCode;
@@ -168,6 +200,10 @@ export interface ServerMessages {
   lobby: LobbySnapshot;
   game: GameUpdate;
   error: RoomError;
+  /** Someone said something. */
+  chat: ChatMessage;
+  /** The recent chat, sent when a player takes a seat or comes back. */
+  chatHistory: { readonly messages: readonly ChatMessage[] };
   /** The room is closing and the connection is about to be dropped. */
   closed: RoomClosed;
 }

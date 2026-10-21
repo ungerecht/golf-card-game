@@ -808,3 +808,110 @@ select:disabled {
   background: #fbe9b7;
   font-weight: 700;
 }
+
+/* Room chat */
+.chat {
+  position: relative;
+  width: 100%;
+  flex: none;
+}
+
+.chat-bar {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ui) * 3);
+  width: 100%;
+  min-height: max(44px, calc(var(--ui) * 12));
+  padding: 0 calc(var(--ui) * 4);
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--ui) * -1) 0 0 var(--ink),
+    0 calc(var(--ui) * 1) 0 0 var(--ink),
+    calc(var(--ui) * -1) 0 0 0 var(--ink),
+    calc(var(--ui) * 1) 0 0 0 var(--ink),
+    0 calc(var(--ui) * 2) 0 0 rgb(0 0 0 / 0.3);
+}
+
+.chat-bar:hover {
+  background: #fffaf0;
+}
+
+.chat-bar:focus-visible,
+.chat-form input:focus-visible {
+  outline: calc(var(--ui) * 1) dashed var(--gold);
+  outline-offset: calc(var(--ui) * 2);
+}
+
+/* One line, cut off with an ellipsis if it is long. */
+.chat-latest {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chat-empty {
+  opacity: 0.6;
+}
+
+.chat-unread {
+  flex: none;
+  min-width: calc(var(--ui) * 8);
+  padding: 0 calc(var(--ui) * 2);
+  background: var(--danger);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Over the top of the page, so opening it moves nothing. */
+.chat-panel {
+  position: fixed;
+  top: calc(var(--ui) * 3);
+  left: 50%;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 3);
+  width: min(calc(var(--px) * 360), calc(100% - 16px));
+  max-height: min(45dvh, 420px);
+  transform: translateX(-50%);
+}
+
+.chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 2);
+  min-height: calc(var(--ui) * 20);
+  margin: 0;
+  /* Leaves room for the red X in the corner. */
+  padding: 0 max(44px, calc(var(--ui) * 12)) 0 0;
+  overflow-y: auto;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.chat-line.mine .chat-name {
+  color: var(--gold-dark);
+}
+
+.chat-warning {
+  margin: 0;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.chat-form {
+  display: flex;
+  gap: calc(var(--ui) * 3);
+}
+
+.chat-form .button {
+  flex: none;
+}

@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  CHAT_HISTORY_LIMIT,
   DEFAULT_SETTINGS,
   chooseAction,
   type AvatarId,
+  type ChatMessage,
   createSeededRng,
   type GameSettings,
   type GameUpdate,
@@ -14,6 +16,8 @@ import {
   type ServerMessageType,
 } from "@golf/shared";
 import {
+  CHAT_BURST,
+  CHAT_WINDOW_MS,
   DEFAULT_RECONNECT_GRACE_MS,
   GameSession,
   type SessionOptions,
@@ -25,6 +29,8 @@ interface Inbox {
   game: GameUpdate[];
   error: RoomError[];
   closed: RoomClosed[];
+  chat: ChatMessage[];
+  chatHistory: { messages: readonly ChatMessage[] }[];
 }
 
 function setup(
@@ -36,7 +42,14 @@ function setup(
   const inbox = (id: string): Inbox => {
     let box = inboxes.get(id);
     if (box === undefined) {
-      box = { lobby: [], game: [], error: [], closed: [] };
+      box = {
+        lobby: [],
+        game: [],
+        error: [],
+        closed: [],
+        chat: [],
+        chatHistory: [],
+      };
       inboxes.set(id, box);
     }
     return box;
@@ -932,5 +945,126 @@ describe("the end of the game", () => {
     expect(
       last(h.inbox(dropped === "a" ? "b" : "a").lobby).players.map((p) => p.id),
     ).toEqual([dropped === "a" ? "b" : "a"]);
+  });
+});
+
+describe("room chat", () => {
+  function table() {
+    const h = setup();
+    join(h.session, "a", "Ann", "visor");
+    join(h.session, "b", "Ben", "teal");
+    return h;
+  }
+
+  it("shows a message to everyone, sender included, with who said it", () => {
+    vi.setSystemTime(5000);
+    const { session, inbox } = table();
+    session.chat("a", "hello there");
+    for (const id of ["a", "b"]) {
+      expect(inbox(id).chat).toEqual([
+        {
+          id: 1,
+          playerId: "a",
+          name: "Ann",
+          avatar: "visor",
+          text: "hello there",
+          at: 5000,
+        },
+      ]);
+    }
+  });
+
+  it("numbers messages in order", () => {
+    const { session, inbox } = table();
+    session.chat("a", "one");
+    session.chat("b", "two");
+    expect(inbox("a").chat.map((m) => [m.id, m.text])).toEqual([
+      [1, "one"],
+      [2, "two"],
+    ]);
+  });
+
+  it("does not let someone without a seat speak, or listen", () => {
+    const { session, inbox } = table();
+    session.connect("c");
+    session.chat("c", "hi");
+    expect(last(inbox("c").error).code).toBe("NOT_READY");
+    session.chat("a", "private to seated players");
+    expect(inbox("c").chat).toHaveLength(0);
+    expect(inbox("a").chat).toHaveLength(1);
+  });
+
+  it("gives a new player the recent chat when they take a seat", () => {
+    const { session, inbox } = table();
+    session.chat("a", "before");
+    join(session, "c", "Cy", "lavender");
+    expect(last(inbox("c").chatHistory).messages.map((m) => m.text)).toEqual([
+      "before",
+    ]);
+    expect(inbox("c").chat).toHaveLength(0);
+  });
+
+  it("catches a returning player up", () => {
+    const { session, inbox } = table();
+    session.chat("a", "one");
+    session.start("a");
+    session.disconnect("b");
+    session.chat("a", "while you were away");
+    session.reconnect("b");
+    expect(last(inbox("b").chatHistory).messages.map((m) => m.text)).toEqual([
+      "one",
+      "while you were away",
+    ]);
+  });
+
+  it("keeps only the most recent messages", () => {
+    const { session, inbox } = table();
+    for (let i = 1; i <= CHAT_HISTORY_LIMIT + 5; i += 1) {
+      session.chat("a", `m${i}`);
+      vi.advanceTimersByTime(CHAT_WINDOW_MS);
+    }
+    join(session, "c", "Cy", "lavender");
+    const { messages } = last(inbox("c").chatHistory);
+    expect(messages).toHaveLength(CHAT_HISTORY_LIMIT);
+    expect(messages[0]?.text).toBe("m6");
+    expect(messages.at(-1)?.text).toBe(`m${CHAT_HISTORY_LIMIT + 5}`);
+  });
+
+  it("slows down someone who floods the room, then lets them speak again", () => {
+    const { session, inbox } = table();
+    for (let i = 0; i < CHAT_BURST; i += 1) session.chat("a", `m${i}`);
+    session.chat("a", "too many");
+    expect(last(inbox("a").error).code).toBe("CHAT_TOO_FAST");
+    expect(inbox("b").chat).toHaveLength(CHAT_BURST);
+    // Someone else is unaffected.
+    session.chat("b", "still fine");
+    expect(inbox("a").chat).toHaveLength(CHAT_BURST + 1);
+
+    vi.advanceTimersByTime(CHAT_WINDOW_MS);
+    session.chat("a", "back again");
+    expect(last(inbox("b").chat).text).toBe("back again");
+  });
+
+  it("keeps the chat from before a game through playing again", () => {
+    const { session, inbox } = table();
+    session.chat("a", "good luck");
+    session.start("a");
+    session.chat("b", "you too");
+    expect(inbox("a").chat.map((m) => m.text)).toEqual([
+      "good luck",
+      "you too",
+    ]);
+  });
+
+  it("ignores bots when handing out messages", () => {
+    const { session, inbox } = setup({ bots: true, maxPlayers: 3 });
+    join(session, "a", "Ann", "visor");
+    session.start("a");
+    session.chat("a", "hi bots");
+    expect(inbox("a").chat).toHaveLength(1);
+    // Bots hold seats too, so a bot id has no way to speak.
+    const botId = session.snapshot().players.find((p) => p.isBot)?.id ?? "";
+    session.chat(botId, "beep");
+    expect(inbox("a").chat).toHaveLength(1);
   });
 });

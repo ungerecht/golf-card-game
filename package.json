@@ -6,6 +6,7 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck && tsc -p .",
     "test": "pnpm -r test",
+    "test:e2e": "playwright test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

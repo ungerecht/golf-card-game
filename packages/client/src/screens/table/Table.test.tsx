@@ -147,6 +147,20 @@ describe("Table", () => {
       ).toHaveLength(2);
     });
 
+    it("never shows the card someone else took from the discard pile", () => {
+      // That card is public, so p2's view carries it, but p1 is the one holding it.
+      setup(2, "p2", placing("discard"));
+      expect(
+        screen.queryByRole("group", { name: "Your drawn card" }),
+      ).not.toBeInTheDocument();
+      cleanup();
+
+      setup(2, "p1", placing("discard"));
+      expect(
+        screen.getByRole("group", { name: "Your drawn card" }),
+      ).toBeInTheDocument();
+    });
+
     it("highlights the pile the card was taken from", () => {
       setup(2, "p2", placing("deck"));
       expect(pile(/Draw/)).toHaveAttribute("data-active", "true");

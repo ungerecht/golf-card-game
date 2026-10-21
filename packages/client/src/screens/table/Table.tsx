@@ -56,7 +56,11 @@ export function Table({
             isCurrent={player.id === view.currentPlayerId}
             isDealer={player.id === view.dealerId}
             held={
-              player.id === view.viewerId && view.phase.type === "place"
+              // A card taken from the discard pile is public, so every view
+              // carries it. Only the player holding it shows it on their seat.
+              player.id === view.viewerId &&
+              view.currentPlayerId === view.viewerId &&
+              view.phase.type === "place"
                 ? view.phase.drawn
                 : null
             }

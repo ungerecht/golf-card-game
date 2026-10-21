@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Action, GameView, LobbySnapshot } from "@golf/shared";
 import { GameMenu } from "./GameMenu";
 import { Piles } from "./Piles";
@@ -12,6 +13,7 @@ export function Table({
   lobby,
   onAct,
   onLeave,
+  banner,
 }: {
   view: GameView;
   lobby: LobbySnapshot;
@@ -19,6 +21,8 @@ export function Table({
   onAct: (action: Action) => void;
   /** Called once the player has confirmed they want to leave. */
   onLeave: () => void;
+  /** Something to show under the status bar, like a way back to the results. */
+  banner?: ReactNode;
 }) {
   const info = new Map(lobby.players.map((p) => [p.id, p]));
   const nameOf = (id: string) => info.get(id)?.name ?? "Player";
@@ -36,6 +40,7 @@ export function Table({
           <strong>{statusText(view, nameOf)}</strong>
         </p>
       </div>
+      {banner}
       <div className="table" data-players={view.players.length}>
         {seats.map(({ position, player }) => (
           <Seat

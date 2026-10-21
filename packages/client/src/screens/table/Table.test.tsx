@@ -18,6 +18,7 @@ function setup(
   count: number,
   viewer: string | null,
   state?: Partial<GameState>,
+  onLeave = vi.fn(),
 ) {
   const ids = NAMES.slice(0, count).map((_, i) => `p${i + 1}`);
   const game: GameState = {
@@ -32,7 +33,12 @@ function setup(
   );
   const onAct = vi.fn();
   render(
-    <Table view={getPlayerView(game, viewer)} lobby={snapshot} onAct={onAct} />,
+    <Table
+      view={getPlayerView(game, viewer)}
+      lobby={snapshot}
+      onAct={onAct}
+      onLeave={onLeave}
+    />,
   );
   return onAct;
 }
@@ -110,22 +116,61 @@ describe("Table", () => {
     );
   });
 
-  it("shows the card being held only to the player holding it", () => {
-    const base = createGame(DEFAULT_SETTINGS, ["p1", "p2"], () => 0.3);
-    const drawn = base.deck.at(-1)!;
-    const place: Partial<GameState> = {
-      deck: base.deck.slice(0, -1),
-      currentPlayerIndex: 0,
-      phase: { type: "place", drawn, source: "deck" },
+  describe("a card being placed", () => {
+    const placing = (source: "deck" | "discard"): Partial<GameState> => {
+      const base = createGame(DEFAULT_SETTINGS, ["p1", "p2"], () => 0.3);
+      return {
+        deck: base.deck.slice(0, -1),
+        currentPlayerIndex: 0,
+        phase: { type: "place", drawn: base.deck.at(-1)!, source },
+      };
     };
-    const held = () => screen.getByText("Ann holds").closest("figure")!;
+    const pile = (name: RegExp) =>
+      screen.getByText(name).closest("figure") as HTMLElement;
 
-    setup(2, "p1", place);
-    expect(within(held()).getByAltText(/ of /)).toBeInTheDocument();
-    cleanup();
+    it("floats the card over your own hand, for you only", () => {
+      setup(2, "p1", placing("deck"));
+      const held = screen.getByRole("group", { name: "Your drawn card" });
+      expect(within(held).getByAltText(/ of /)).toBeInTheDocument();
+      expect(seat("Ann (you)")).toContainElement(held);
+      cleanup();
 
-    setup(2, "p2", place);
-    expect(within(held()).getByAltText("Face-down card")).toBeInTheDocument();
+      setup(2, "p2", placing("deck"));
+      expect(
+        screen.queryByRole("group", { name: "Your drawn card" }),
+      ).not.toBeInTheDocument();
+      // Nobody sees another player's held card, not even its back.
+      expect(
+        within(screen.getByRole("group", { name: "Piles" })).getAllByRole(
+          "img",
+        ),
+      ).toHaveLength(2);
+    });
+
+    it("highlights the pile the card was taken from", () => {
+      setup(2, "p2", placing("deck"));
+      expect(pile(/Draw/)).toHaveAttribute("data-active", "true");
+      expect(pile(/Discard/)).toHaveAttribute("data-active", "false");
+      cleanup();
+
+      setup(2, "p2", placing("discard"));
+      expect(pile(/Draw/)).toHaveAttribute("data-active", "false");
+      expect(pile(/Discard/)).toHaveAttribute("data-active", "true");
+    });
+
+    it("highlights nothing the rest of the time", () => {
+      setup(2, "p1");
+      expect(pile(/Draw/)).toHaveAttribute("data-active", "false");
+      expect(pile(/Discard/)).toHaveAttribute("data-active", "false");
+    });
+  });
+
+  it("no longer shows scores or a leave button on the table", () => {
+    setup(3, "p1");
+    expect(screen.queryByText(/^Score/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /leave/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows a spectator the first player at the bottom", () => {
@@ -144,7 +189,7 @@ describe("Table", () => {
 
     it("never makes other players' cards or the piles clickable then", () => {
       setup(3, "p1");
-      expect(screen.getAllByRole("button")).toHaveLength(6);
+      expect(screen.getAllByRole("button", { name: /^Flip/ })).toHaveLength(6);
       expect(within(seat("Ben")).queryByRole("button")).not.toBeInTheDocument();
     });
 
@@ -186,6 +231,7 @@ describe("Table", () => {
 
     it("lets you press a card with the keyboard", async () => {
       const onAct = setup(2, "p1");
+      await userEvent.tab(); // the menu button comes first
       await userEvent.tab();
       await userEvent.keyboard("{Enter}");
       expect(onAct).toHaveBeenCalledWith({ type: "flipInitial", slot: 0 });
@@ -196,7 +242,11 @@ describe("Table", () => {
         phase: { type: "flipOrDraw" },
         currentPlayerIndex: 1,
       });
-      expect(screen.queryAllByRole("button")).toHaveLength(0);
+      expect(
+        screen.queryAllByRole("button", {
+          name: /^(Flip|Draw|Take|Swap|Discard)/,
+        }),
+      ).toHaveLength(0);
     });
   });
 });

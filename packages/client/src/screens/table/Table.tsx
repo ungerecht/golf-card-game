@@ -1,4 +1,5 @@
 import type { Action, GameView, LobbySnapshot } from "@golf/shared";
+import { GameMenu } from "./GameMenu";
 import { Piles } from "./Piles";
 import { Seat } from "./Seat";
 import { arrangeSeats } from "./seats";
@@ -10,11 +11,14 @@ export function Table({
   view,
   lobby,
   onAct,
+  onLeave,
 }: {
   view: GameView;
   lobby: LobbySnapshot;
   /** Called with the action a click asks for. */
   onAct: (action: Action) => void;
+  /** Called once the player has confirmed they want to leave. */
+  onLeave: () => void;
 }) {
   const info = new Map(lobby.players.map((p) => [p.id, p]));
   const nameOf = (id: string) => info.get(id)?.name ?? "Player";
@@ -23,12 +27,15 @@ export function Table({
 
   return (
     <div className="table-wrap">
-      <p className="panel status" role="status">
-        <span>
-          Hole {view.hole} of {view.settings.holes}
-        </span>
-        <strong>{statusText(view, nameOf)}</strong>
-      </p>
+      <div className="topbar">
+        <GameMenu view={view} lobby={lobby} onLeave={onLeave} />
+        <p className="panel status" role="status">
+          <span>
+            Hole {view.hole} of {view.settings.holes}
+          </span>
+          <strong>{statusText(view, nameOf)}</strong>
+        </p>
+      </div>
       <div className="table" data-players={view.players.length}>
         {seats.map(({ position, player }) => (
           <Seat
@@ -39,16 +46,16 @@ export function Table({
             isViewer={player.id === view.viewerId}
             isCurrent={player.id === view.currentPlayerId}
             isDealer={player.id === view.dealerId}
+            held={
+              player.id === view.viewerId && view.phase.type === "place"
+                ? view.phase.drawn
+                : null
+            }
             actions={player.id === view.viewerId ? targets.slots : undefined}
             onAct={onAct}
           />
         ))}
-        <Piles
-          view={view}
-          holderName={nameOf(view.currentPlayerId)}
-          targets={targets}
-          onAct={onAct}
-        />
+        <Piles view={view} targets={targets} onAct={onAct} />
       </div>
     </div>
   );

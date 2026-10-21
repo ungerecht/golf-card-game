@@ -12,25 +12,25 @@ export function GameRoom() {
   const act = useLobby((s) => s.act);
   const leave = useLobby((s) => s.leave);
 
+  const leaveRoom = () => void leave().then(() => navigate("/"));
+
   return (
     <main className="game">
       {game === null || lobby === null ? (
-        <p className="panel">Dealing the cards…</p>
+        <>
+          <p className="panel">Dealing the cards…</p>
+          <button type="button" className="button" onClick={leaveRoom}>
+            Leave Room
+          </button>
+        </>
       ) : (
-        <Table view={game.view} lobby={lobby} onAct={act} />
+        <Table view={game.view} lobby={lobby} onAct={act} onLeave={leaveRoom} />
       )}
       {error !== null && (
         <p className="banner" role="alert">
           {errorText(error)}
         </p>
       )}
-      <button
-        type="button"
-        className="button leave"
-        onClick={() => void leave().then(() => navigate("/"))}
-      >
-        Leave Room
-      </button>
     </main>
   );
 }

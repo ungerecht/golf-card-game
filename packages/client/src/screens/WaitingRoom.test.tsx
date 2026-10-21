@@ -209,7 +209,10 @@ describe("starting and leaving", () => {
       screen.getByRole("region", { name: "Ben (you)" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Ann" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Leave Room" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Menu" })).toBeEnabled();
+    expect(
+      screen.queryByRole("button", { name: "Leave Room" }),
+    ).not.toBeInTheDocument();
   });
 
   it("sends the move you click to the server", async () => {
@@ -248,6 +251,29 @@ describe("starting and leaving", () => {
     );
     act(() => app.connector.room.emit("error", { code: "NOT_YOUR_TURN" }));
     expect(screen.getByRole("alert")).toHaveTextContent("not your turn");
+  });
+
+  it("leaves the game from the menu, after asking", async () => {
+    const app = await joining();
+    send(
+      app,
+      lobby([player("host", "Ann", "visor"), player("me", "Ben", "teal")], {
+        hostId: "host",
+        started: true,
+      }),
+    );
+    const state = createGame(DEFAULT_SETTINGS, ["host", "me"], () => 0.5);
+    act(() =>
+      app.connector.room.emit("game", gameUpdate(getPlayerView(state, "me"))),
+    );
+    await app.user.click(screen.getByRole("button", { name: "Menu" }));
+    await app.user.click(screen.getByRole("menuitem", { name: "Leave room" }));
+    expect(app.connector.room.left).toBe(false);
+    await app.user.click(screen.getByRole("button", { name: "Leave" }));
+    expect(app.connector.room.left).toBe(true);
+    expect(
+      await screen.findByRole("heading", { name: "Six Card Golf" }),
+    ).toBeInTheDocument();
   });
 
   it("goes to the landing page when someone leaves the room", async () => {

@@ -3,6 +3,8 @@ import {
   DEFAULT_SETTINGS,
   type AvatarId,
   type GameSettings,
+  type GameUpdate,
+  type GameView,
   type LobbyPlayer,
   type LobbySnapshot,
   type RoomStatus,
@@ -154,5 +156,16 @@ export function lobby(
     started: false,
     serverTime: 0,
     ...extra,
+  };
+}
+
+/** A game update wrapping `view`, as the server would send it. */
+export function gameUpdate(view: GameView): GameUpdate {
+  return {
+    view,
+    events: [],
+    serverTime: 0,
+    nextHoleAt: null,
+    result: null,
   };
 }

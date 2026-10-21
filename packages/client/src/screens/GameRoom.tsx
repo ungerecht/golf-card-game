@@ -1,22 +1,24 @@
 import { useNavigate } from "react-router";
 import { useLobby } from "../store/useLobby";
+import { Table } from "./table/Table";
 
-/** The table comes in the next change. For now, say the game has started. */
+/** The game in progress. */
 export function GameRoom() {
   const navigate = useNavigate();
   const lobby = useLobby((s) => s.lobby);
+  const game = useLobby((s) => s.game);
   const leave = useLobby((s) => s.leave);
 
   return (
-    <main className="screen">
-      <h1 className="title small">Game on</h1>
-      <p className="panel">
-        {lobby?.players.map((p) => p.name).join(", ")} are playing. The table is
-        coming soon.
-      </p>
+    <main className="game">
+      {game === null || lobby === null ? (
+        <p className="panel">Dealing the cards…</p>
+      ) : (
+        <Table view={game.view} lobby={lobby} />
+      )}
       <button
         type="button"
-        className="button"
+        className="button leave"
         onClick={() => void leave().then(() => navigate("/"))}
       >
         Leave Room

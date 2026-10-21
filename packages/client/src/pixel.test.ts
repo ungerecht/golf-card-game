@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ART_WIDTH, pixelSize } from "./pixel";
+import { ART_WIDTH, handScale, pixelSize } from "./pixel";
 
 describe("pixelSize", () => {
   it("is always a whole number of device pixels", () => {
@@ -28,5 +28,12 @@ describe("pixelSize", () => {
 
   it("never drops below one device pixel", () => {
     expect(pixelSize(100, 1)).toBe(1);
+  });
+});
+
+describe("handScale", () => {
+  it("doubles the cards on a phone but not on a big screen", () => {
+    expect(handScale(pixelSize(390, 3))).toBe(2);
+    expect(handScale(pixelSize(1280, 1))).toBe(1);
   });
 });

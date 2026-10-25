@@ -46,7 +46,9 @@ export function GameMenu({
         aria-expanded={open === "menu"}
         onClick={() => setOpen(open === "menu" ? "none" : "menu")}
       >
-        <span className="material-symbols-outlined">dehaze</span>
+        <span className="material-symbols-outlined" aria-hidden="true">
+          dehaze
+        </span>
       </button>
       {open === "menu" && (
         <div className="panel menu" role="menu">

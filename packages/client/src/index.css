@@ -260,6 +260,10 @@ select:disabled {
   position: relative;
 }
 
+.portrait:has(span.tag.away){
+  opacity: 0.5;
+}
+
 .portrait.placeholder {
   background: transparent;
   box-shadow: none;
@@ -363,7 +367,7 @@ select:disabled {
   grid-template-rows: auto auto auto auto;
   grid-template-areas:
     "top top top"
-    "left none right"
+    "left . right"
     "middle middle middle"
     "bottom bottom bottom";
   align-items: center;
@@ -557,11 +561,6 @@ select:disabled {
   padding: 0;
   cursor: pointer;
   background: var(--paper-shade);
-
-  span {
-    font-size: 32px;
-    padding: 4px;
-  }
 }
 
 .info {
@@ -575,11 +574,6 @@ select:disabled {
   background: var(--paper-shade);
   padding: 0;
   cursor: pointer;
-
-  span {
-    font-size: 32px;
-    padding: 4px;
-  }
 }
 
 .hamburger:focus-visible,
@@ -946,4 +940,10 @@ select:disabled {
 
 .chat-form .button {
   flex: none;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined Variable", sans-serif;
+  font-size: 32px;
+  padding: 1px 4px;
 }

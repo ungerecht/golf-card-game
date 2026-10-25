@@ -26,7 +26,7 @@ export function Piles({
         <CardSprite face={face} />
         {highlighted && (
           <img
-            className="selection full on"
+            className="selection on"
             src={selectionUrl()}
             alt=""
             aria-hidden="true"

@@ -16,7 +16,7 @@ export function CardSprite({ face }: { face: CardFace }) {
         : [cardUrl(face), cardLabel(face)];
   return (
     <img
-      className={`card`}
+      className="card"
       src={src}
       alt={alt}
       decoding="sync"

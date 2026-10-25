@@ -3,7 +3,7 @@ import type { GameView, LobbyPlayer } from "@golf/shared";
 import { Dialog } from "./Dialog";
 import { statusText } from "./status";
 
-/** The info button in the right corner, and everything it opens. */
+/** The info button in the bottom left corner, and everything it opens. */
 export function Info({
   view,
   info,
@@ -21,9 +21,12 @@ export function Info({
         type="button"
         className="question"
         aria-expanded={open}
+        aria-label="Game info"
         onClick={() => setOpen(!open)}
       >
-        <span className="material-symbols-outlined">help</span>
+        <span className="material-symbols-outlined" aria-hidden="true">
+          help
+        </span>
       </button>
       {open && (
         <Dialog title="Status" onClose={onClose} closeLabel="Close status">

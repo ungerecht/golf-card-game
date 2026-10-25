@@ -46,7 +46,7 @@ export function Seat({
           <span className="seat-meta">
             {isDealer && <span className="tag">D</span>}
             {info !== undefined && !info.connected && (
-              <span className="tag away">...</span>
+              <span className="tag away" aria-label="Away">...</span>
             )}
           </span>
         </div>
@@ -57,9 +57,7 @@ export function Seat({
         {held && isCurrent && (
           // Floats above your cards so nothing else moves while you hold it.
           <div
-            className={
-              "held " + (held.source as string) + " " + (position as string)
-            }
+            className={"held " + held.source + " " + position}
             role="group"
             aria-label="Drawn card"
           >

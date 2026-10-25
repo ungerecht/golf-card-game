@@ -22,7 +22,7 @@ export function pixelSize(
   const ratio = devicePixelRatio > 0 ? devicePixelRatio : 1;
   const fitWidth = Math.floor((cssWidth * ratio) / ART_WIDTH);
   const fitHeight = Math.floor((cssHeight * ratio) / ART_HEIGHT);
-  return Math.round(Math.max(1, Math.min(fitWidth, fitHeight)) / ratio);
+  return Math.max(1, Math.min(fitWidth, fitHeight)) / ratio;
 }
 
 /**

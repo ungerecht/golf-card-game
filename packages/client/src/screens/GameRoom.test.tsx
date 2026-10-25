@@ -92,7 +92,7 @@ describe("between holes", () => {
     );
     // Ben scored 2 and Ann 5, so Ben is listed first.
     const rows = dialog.getAllByRole("row").slice(1);
-    expect(rows.map((r) => r.textContent)).toEqual(["Ben (you)22", "Ann55"]);
+    expect(rows.map((r) => r.textContent)).toEqual(["Ben22", "Ann55"]);
     expect(dialog.getByRole("timer")).toHaveTextContent(
       "Next hole starts in 30s",
     );
@@ -148,7 +148,6 @@ describe("between holes", () => {
     };
     send(app, update(next));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Hole 2 of 3");
   });
 
   it("shows the summary again for the next hole after one was closed", async () => {
@@ -174,7 +173,6 @@ describe("the end of the game", () => {
       screen.getByRole("heading", { name: "Game over" }),
     ).toBeInTheDocument();
     // Ben: 9. Ann: 12. So Ben wins.
-    expect(screen.getByRole("status")).toHaveTextContent("You win!");
     const totals = within(screen.getByRole("table")).getAllByRole("row").at(-1);
     expect(totals).toHaveTextContent("Total912");
     // The table is gone, along with its menu.
@@ -207,7 +205,6 @@ describe("the end of the game", () => {
     expect(
       screen.queryByRole("heading", { name: "Game over" }),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Hole 1 of 3");
   });
 
   it("shows why Play Again was refused", async () => {

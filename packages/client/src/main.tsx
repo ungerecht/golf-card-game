@@ -1,8 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import "@fontsource/pixelify-sans/400.css";
-import "@fontsource/pixelify-sans/700.css";
+import "@fontsource/unifontex";
 import "./index.css";
 import { App } from "./App";
 import { allAvatarUrls } from "./avatars";

@@ -1,5 +1,3 @@
-import { AVATAR_LABELS } from "../../avatars";
-import { Avatar } from "../Avatar";
 import type { ScoreColumn } from "./scores";
 
 /** A row per hole and a column per player, with a total at the bottom. */
@@ -26,19 +24,7 @@ export function ScoreTable({
             </th>
             {columns.map((c) => (
               <th key={c.playerId} scope="col" className={mark(c)}>
-                {c.avatar !== null && (
-                  <span
-                    className="score-face"
-                    role="img"
-                    aria-label={AVATAR_LABELS[c.avatar]}
-                  >
-                    <Avatar id={c.avatar} />
-                  </span>
-                )}
-                <span className="score-name">
-                  {c.name}
-                  {c.isViewer && " (you)"}
-                </span>
+                <span className="score-name">{c.name}</span>
               </th>
             ))}
           </tr>

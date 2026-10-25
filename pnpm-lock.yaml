@@ -207,7 +207,7 @@ importers:
       '@colyseus/sdk':
         specifier: ^0.18.5
         version: 0.18.5(@colyseus/core@0.18.18)(typescript@6.0.3)(zod@4.6.7)
-      '@fontsource/pixelify-sans':
+      '@fontsource/unifontex':
         specifier: ^5.3.0
         version: 5.3.0
       '@golf/shared':
@@ -757,8 +757,8 @@ packages:
       '@noble/hashes':
         optional: true
 
-  '@fontsource/pixelify-sans@5.3.0':
-    resolution: {integrity: sha512-4RCe9nXbi7wUu5+H0FNX1sgPZ2kJ1MmY1uTkEfvQIzzqhoS8zGKJaJfdK8oreE0OU+5gM+NdurFi3H3FJRBvyw==}
+  '@fontsource/unifontex@5.3.0':
+    resolution: {integrity: sha512-gR/tdFohBxyWk5ojTvUAlYe0bSTpstvGDKzupFQ1O9uwRRZpwQ0vamIDvGPrl2Hym94FhWC+mr1A4cLfFkKz3g==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -2889,7 +2889,7 @@ snapshots:
 
   '@exodus/bytes@1.16.0': {}
 
-  '@fontsource/pixelify-sans@5.3.0': {}
+  '@fontsource/unifontex@5.3.0': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

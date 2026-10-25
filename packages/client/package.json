@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@colyseus/sdk": "^0.18.5",
-    "@fontsource/pixelify-sans": "^5.3.0",
+    "@fontsource/unifontex": "^5.3.0",
     "@golf/shared": "workspace:*",
     "motion": "^14.1.0",
     "react": "^19.2.8",

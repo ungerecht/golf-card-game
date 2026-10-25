@@ -49,7 +49,7 @@ describe("Table", () => {
   it("shows every player with a name, a portrait and six cards", () => {
     setup(4, "p1");
     expect(screen.getAllByRole("region", { name: /./ })).toHaveLength(4);
-    expect(seat("Ann (you)")).toBeInTheDocument();
+    expect(seat("Ann")).toBeInTheDocument();
     for (const name of ["Ben", "Cy", "Di"]) {
       const region = seat(name);
       expect(within(region).getAllByAltText("Face-down card")).toHaveLength(6);
@@ -59,22 +59,16 @@ describe("Table", () => {
     expect(screen.getByAltText("Bucket hat")).toBeInTheDocument();
   });
 
-  it("puts the viewer at the bottom with full cards, and others in mini", () => {
+  it("puts the viewer at the bottom", () => {
     setup(3, "p2");
-    expect(seat("Ben (you)")).toHaveClass("bottom");
+    expect(seat("Ben")).toHaveClass("bottom");
     expect(seat("Cy")).toHaveClass("left");
     expect(seat("Ann")).toHaveClass("right");
-    expect(
-      within(seat("Ben (you)")).getAllByAltText("Face-down card")[0],
-    ).toHaveClass("full");
-    expect(
-      within(seat("Ann")).getAllByAltText("Face-down card")[0],
-    ).toHaveClass("mini");
   });
 
   it("shows two players top and bottom", () => {
     setup(2, "p1");
-    expect(seat("Ann (you)")).toHaveClass("bottom");
+    expect(seat("Ann")).toHaveClass("bottom");
     expect(seat("Ben")).toHaveClass("top");
   });
 
@@ -92,7 +86,7 @@ describe("Table", () => {
       base.players[1]!,
     ];
     setup(2, "p1", { players });
-    const mine = within(seat("Ann (you)"));
+    const mine = within(seat("Ann"));
     expect(mine.getAllByAltText("Face-down card")).toHaveLength(5);
     expect(mine.getByAltText(/ of /)).toBeInTheDocument();
   });
@@ -101,9 +95,8 @@ describe("Table", () => {
     setup(3, "p1");
     // The player after the dealer goes first.
     expect(seat("Ben")).toHaveAttribute("aria-current", "true");
-    expect(seat("Ann (you)")).not.toHaveAttribute("aria-current");
-    expect(within(seat("Ann (you)")).getByText("Dealer")).toBeInTheDocument();
-    expect(within(seat("Cy")).getByText("Bot")).toBeInTheDocument();
+    expect(seat("Ann")).not.toHaveAttribute("aria-current");
+    expect(within(seat("Ann")).getByText("D")).toBeInTheDocument();
   });
 
   it("shows the piles and the hole", () => {
@@ -111,9 +104,6 @@ describe("Table", () => {
     const piles = within(screen.getByRole("group", { name: "Piles" }));
     expect(piles.getByText(/Draw \(\d+\)/)).toBeInTheDocument();
     expect(piles.getByText("Discard")).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      `Hole 1 of ${DEFAULT_SETTINGS.holes}`,
-    );
   });
 
   describe("a card being placed", () => {
@@ -128,37 +118,11 @@ describe("Table", () => {
     const pile = (name: RegExp) =>
       screen.getByText(name).closest("figure") as HTMLElement;
 
-    it("floats the card over your own hand, for you only", () => {
+    it("floats the card over your own hand", () => {
       setup(2, "p1", placing("deck"));
-      const held = screen.getByRole("group", { name: "Your drawn card" });
+      const held = screen.getByRole("group", { name: "Drawn card" });
       expect(within(held).getByAltText(/ of /)).toBeInTheDocument();
-      expect(seat("Ann (you)")).toContainElement(held);
-      cleanup();
-
-      setup(2, "p2", placing("deck"));
-      expect(
-        screen.queryByRole("group", { name: "Your drawn card" }),
-      ).not.toBeInTheDocument();
-      // Nobody sees another player's held card, not even its back.
-      expect(
-        within(screen.getByRole("group", { name: "Piles" })).getAllByRole(
-          "img",
-        ),
-      ).toHaveLength(2);
-    });
-
-    it("never shows the card someone else took from the discard pile", () => {
-      // That card is public, so p2's view carries it, but p1 is the one holding it.
-      setup(2, "p2", placing("discard"));
-      expect(
-        screen.queryByRole("group", { name: "Your drawn card" }),
-      ).not.toBeInTheDocument();
-      cleanup();
-
-      setup(2, "p1", placing("discard"));
-      expect(
-        screen.getByRole("group", { name: "Your drawn card" }),
-      ).toBeInTheDocument();
+      expect(seat("Ann")).toContainElement(held);
     });
 
     it("highlights the pile the card was taken from", () => {

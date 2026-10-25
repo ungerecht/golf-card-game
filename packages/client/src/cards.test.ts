@@ -8,28 +8,21 @@ import {
   cardUrl,
   emptySlotUrl,
   selectionUrl,
-  type CardSize,
 } from "./cards";
 
-const SIZES: readonly CardSize[] = ["full", "mini"];
-
 describe("card images", () => {
-  it("has a face for all 52 cards at both sizes, each one different", () => {
-    for (const size of SIZES) {
-      const urls = buildDeck().map((card) => cardUrl(card, size));
-      expect(new Set(urls).size).toBe(52);
-    }
+  it("has a face for all 52 cards, each one different", () => {
+    const urls = buildDeck().map((card) => cardUrl(card));
+    expect(new Set(urls).size).toBe(52);
   });
 
-  it("has a back, an empty slot and a selection outline at both sizes", () => {
-    for (const size of SIZES) {
-      const urls = [cardBackUrl(size), emptySlotUrl(size), selectionUrl(size)];
-      expect(new Set(urls).size).toBe(3);
-    }
+  it("has a back, an empty slot and a selection outline", () => {
+    const urls = [cardBackUrl(), emptySlotUrl(), selectionUrl()];
+    expect(new Set(urls).size).toBe(3);
   });
 
-  it("has no stray files: 55 images per size", () => {
-    expect(CARD_IMAGE_COUNT).toBe(2 * (52 + 3));
+  it("has no stray files: 55 images", () => {
+    expect(CARD_IMAGE_COUNT).toBe(52 + 3);
   });
 
   it("names every rank", () => {

@@ -71,10 +71,7 @@ export function HoleSummary({
                       <Avatar id={r.avatar} />
                     </span>
                   )}
-                  <span className="score-name">
-                    {r.name}
-                    {r.isViewer && " (you)"}
-                  </span>
+                  <span className="score-name">{r.name}</span>
                 </div>
               </th>
               <td>{r.hole}</td>

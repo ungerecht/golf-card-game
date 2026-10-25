@@ -70,7 +70,7 @@ describe("the game menu", () => {
     await user.click(screen.getByRole("menuitem", { name: "View scores" }));
 
     const sheet = within(screen.getByRole("dialog", { name: "Scores" }));
-    expect(sheet.getByText("Ann (you)")).toBeInTheDocument();
+    expect(sheet.getByText("Ann")).toBeInTheDocument();
     expect(sheet.getByText("Bo")).toBeInTheDocument();
     // A row per hole of the game, played or not, and a total.
     const rows = sheet.getAllByRole("row").slice(1);

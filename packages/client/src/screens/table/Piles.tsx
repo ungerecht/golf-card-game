@@ -23,11 +23,11 @@ export function Piles({
   const pile = (face: CardFace, action: Action | null, highlighted: boolean) =>
     action === null ? (
       <div className="frame">
-        <CardSprite face={face} size="full" />
+        <CardSprite face={face} />
         {highlighted && (
           <img
             className="selection full on"
-            src={selectionUrl("full")}
+            src={selectionUrl()}
             alt=""
             aria-hidden="true"
             draggable={false}
@@ -35,7 +35,7 @@ export function Piles({
         )}
       </div>
     ) : (
-      <CardButton face={face} size="full" action={action} onAct={onAct} />
+      <CardButton face={face} action={action} onAct={onAct} />
     );
 
   return (

@@ -1,31 +1,11 @@
 import type { Card, Rank } from "@golf/shared";
 
-/** Full cards have pips and are for the viewer's own hand. Mini cards are for everyone else. */
-export type CardSize = "full" | "mini";
-
-/** The size of each card in art pixels. Both are 5:7. */
-export const CARD_ART_SIZE: Record<
-  CardSize,
-  { width: number; height: number }
-> = {
-  full: { width: 40, height: 56 },
-  mini: { width: 20, height: 28 },
-};
-
-const FOLDER: Record<CardSize, string> = {
-  full: "cards",
-  mini: "miniCards",
-};
-
 // Every card image, keyed by its path.
-const sprites = import.meta.glob<string>(
-  "./assets/{cards,miniCards}/**/*.png",
-  {
-    eager: true,
-    query: "?url",
-    import: "default",
-  },
-);
+const sprites = import.meta.glob<string>("./assets/cards/**/*.png", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
 
 /** The file names use words for ranks: A is "ace", 10 is "ten", K is "king". */
 export const RANK_WORDS: Record<Rank, string> = {
@@ -44,33 +24,33 @@ export const RANK_WORDS: Record<Rank, string> = {
   K: "king",
 };
 
-function spriteUrl(size: CardSize, file: string): string {
-  const path = `./assets/${FOLDER[size]}/${file}.png`;
+function spriteUrl(file: string): string {
+  const path = `./assets/cards/${file}.png`;
   const url = sprites[path];
   if (url === undefined) throw new Error(`Missing card image ${path}`);
   return url;
 }
 
 /** The face of a card. */
-export function cardUrl(card: Card, size: CardSize): string {
-  return spriteUrl(size, `${card.suit}/${RANK_WORDS[card.rank]}`);
+export function cardUrl(card: Card): string {
+  return spriteUrl(`${card.suit}/${RANK_WORDS[card.rank]}`);
 }
 
-export function cardBackUrl(size: CardSize): string {
-  return spriteUrl(size, "back");
+export function cardBackUrl(): string {
+  return spriteUrl("back");
 }
 
 /** Marks a spot where a card can go, like an empty discard pile. */
-export function emptySlotUrl(size: CardSize): string {
-  return spriteUrl(size, "empty");
+export function emptySlotUrl(): string {
+  return spriteUrl("empty");
 }
 
 /**
  * The outline for a chosen card. It is one art pixel bigger than the card on
  * every side, so draw it one pixel up and to the left of the card.
  */
-export function selectionUrl(size: CardSize): string {
-  return spriteUrl(size, "selection");
+export function selectionUrl(): string {
+  return spriteUrl("selection");
 }
 
 /** For alt text, such as "Queen of hearts". */

@@ -22,9 +22,9 @@ export const AVATAR_IDS = [
 ] as const;
 export type AvatarId = (typeof AVATAR_IDS)[number];
 
-export const PLAYER_NAME_MAX_LENGTH = 20;
+export const PLAYER_NAME_MAX_LENGTH = 8;
 
-/** 1 to 20 characters once trimmed, with no control characters. */
+/** 1 to 8 characters once trimmed, with no control characters. */
 export const PlayerNameSchema = z
   .string()
   .trim()

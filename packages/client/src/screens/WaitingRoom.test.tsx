@@ -55,7 +55,7 @@ describe("the waiting room", () => {
       lobby([player("me", "Ann", "visor"), player("b", "Ben", "teal")]),
     );
     const items = slots().getAllByRole("listitem");
-    expect(within(items[0]!).getByText("Ann (you)")).toBeInTheDocument();
+    expect(within(items[0]!).getByText("Ann")).toBeInTheDocument();
     expect(within(items[0]!).getByText("Host")).toBeInTheDocument();
     expect(within(items[0]!).getByAltText("Visor")).toBeInTheDocument();
     expect(within(items[1]!).getByText("Ben")).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe("the waiting room", () => {
     expect(screen.getByLabelText("Your name")).toBeInTheDocument();
     send(app, lobby([player("me", "Ann", "lavender")]));
     expect(screen.queryByLabelText("Your name")).toBeNull();
-    expect(slots().getByText("Ann (you)")).toBeInTheDocument();
+    expect(slots().getByText("Ann")).toBeInTheDocument();
   });
 
   it("greys out avatars that are taken and will not let you pick them", async () => {
@@ -205,9 +205,7 @@ describe("starting and leaving", () => {
     act(() =>
       app.connector.room.emit("game", gameUpdate(getPlayerView(state, "me"))),
     );
-    expect(
-      screen.getByRole("region", { name: "Ben (you)" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Ben" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Ann" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Menu" })).toBeEnabled();
     expect(

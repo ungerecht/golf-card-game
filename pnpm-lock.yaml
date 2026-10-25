@@ -207,12 +207,18 @@ importers:
       '@colyseus/sdk':
         specifier: ^0.18.5
         version: 0.18.5(@colyseus/core@0.18.18)(typescript@6.0.3)(zod@4.6.7)
-      '@fontsource/pixelify-sans':
+      '@fontsource-variable/material-symbols-outlined':
+        specifier: ^5.3.9
+        version: 5.3.9
+      '@fontsource/unifontex':
         specifier: ^5.3.0
         version: 5.3.0
       '@golf/shared':
         specifier: workspace:*
         version: link:../shared
+      import:
+        specifier: ^0.0.6
+        version: 0.0.6
       motion:
         specifier: ^14.1.0
         version: 14.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -757,8 +763,11 @@ packages:
       '@noble/hashes':
         optional: true
 
-  '@fontsource/pixelify-sans@5.3.0':
-    resolution: {integrity: sha512-4RCe9nXbi7wUu5+H0FNX1sgPZ2kJ1MmY1uTkEfvQIzzqhoS8zGKJaJfdK8oreE0OU+5gM+NdurFi3H3FJRBvyw==}
+  '@fontsource-variable/material-symbols-outlined@5.3.9':
+    resolution: {integrity: sha512-Q4rqYIHWgXJ07+mq8e+8/UOtfKjbi9EEwjJOdaXRtGpeMfmzujBjfeZn4hVewghPl8aljwOAQfTMXLLslP8EKg==}
+
+  '@fontsource/unifontex@5.3.0':
+    resolution: {integrity: sha512-gR/tdFohBxyWk5ojTvUAlYe0bSTpstvGDKzupFQ1O9uwRRZpwQ0vamIDvGPrl2Hym94FhWC+mr1A4cLfFkKz3g==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1616,6 +1625,11 @@ packages:
     resolution: {integrity: sha512-/8UvqAPU9DGTI9k4mxtf49U37Isfwr8Uts96+SBHIkFxPJnHS0Ew4f00sM4Scd8V8EjM0jUNtVDdv1kPdt35lg==}
     engines: {node: '>= 4'}
 
+  import@0.0.6:
+    resolution: {integrity: sha512-QPhTdjy9J4wUzmWSG7APkSgMFuPGPw+iJTYUblcfc2AfpqaatbwgCldK1HoLYx+v/+lWvab63GWZtNkcnj9JcQ==}
+    engines: {node: '>=0.10.0'}
+    hasBin: true
+
   imurmurhash@0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
     engines: {node: '>=0.8.19'}
@@ -1939,6 +1953,9 @@ packages:
 
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
+
+  optimist@0.3.7:
+    resolution: {integrity: sha512-TCx0dXQzVtSCg2OgY/bO9hjM9cV4XYx09TVK+s3+FhkjT6LovsLe+pPMzpWf+6yXK/hUizs2gUoTw3jHM0VaTQ==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -2412,6 +2429,10 @@ packages:
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
+
+  wordwrap@0.0.3:
+    resolution: {integrity: sha512-1tMA907+V4QmxV7dbRvb4/8MaRALK6q9Abid3ndMYnbyo8piisCmeONVqVSXqQA3KaP4SLt5b7ud6E2sqP8TFw==}
+    engines: {node: '>=0.4.0'}
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
@@ -2889,7 +2910,9 @@ snapshots:
 
   '@exodus/bytes@1.16.0': {}
 
-  '@fontsource/pixelify-sans@5.3.0': {}
+  '@fontsource-variable/material-symbols-outlined@5.3.9': {}
+
+  '@fontsource/unifontex@5.3.0': {}
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -3767,6 +3790,10 @@ snapshots:
 
   ignore@7.0.12: {}
 
+  import@0.0.6:
+    dependencies:
+      optimist: 0.3.7
+
   imurmurhash@0.1.4: {}
 
   indent-string@4.0.0: {}
@@ -4057,6 +4084,10 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+
+  optimist@0.3.7:
+    dependencies:
+      wordwrap: 0.0.3
 
   optionator@0.9.4:
     dependencies:
@@ -4473,6 +4504,8 @@ snapshots:
   why-is-node-running@3.2.1: {}
 
   word-wrap@1.2.5: {}
+
+  wordwrap@0.0.3: {}
 
   wrappy@1.0.2: {}
 

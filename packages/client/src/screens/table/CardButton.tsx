@@ -1,5 +1,5 @@
 import type { Action } from "@golf/shared";
-import { selectionUrl, type CardSize } from "../../cards";
+import { selectionUrl } from "../../cards";
 import { CardSprite, type CardFace } from "./CardSprite";
 import { describeAction } from "./targets";
 
@@ -9,12 +9,10 @@ import { describeAction } from "./targets";
  */
 export function CardButton({
   face,
-  size,
   action,
   onAct,
 }: {
   face: CardFace;
-  size: CardSize;
   action: Action;
   onAct: (action: Action) => void;
 }) {
@@ -25,10 +23,10 @@ export function CardButton({
       aria-label={describeAction(action)}
       onClick={() => onAct(action)}
     >
-      <CardSprite face={face} size={size} />
+      <CardSprite face={face} />
       <img
-        className={`selection ${size}`}
-        src={selectionUrl(size)}
+        className="selection"
+        src={selectionUrl()}
         alt=""
         aria-hidden="true"
         draggable={false}

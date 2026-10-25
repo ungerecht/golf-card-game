@@ -104,10 +104,7 @@ export function WaitingRoom() {
               <div className="portrait">
                 <Avatar id={player.avatar} />
               </div>
-              <span className="slot-name">
-                {player.name}
-                {player.id === myId && " (you)"}
-              </span>
+              <span className="slot-name">{player.name}</span>
               {player.id === lobby.hostId && <span className="tag">Host</span>}
             </li>
           );

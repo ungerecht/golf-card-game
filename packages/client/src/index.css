@@ -15,7 +15,7 @@
   --gold-dark: #b9801a;
   --danger: #b3382c;
 
-  --font: "Pixelify Sans", ui-monospace, monospace;
+  --font: "UnifontEX", monospace;
   font-family: var(--font);
   color: var(--ink);
   line-height: 1.25;
@@ -81,7 +81,8 @@ select,
 .banner,
 .avatar-choice,
 .hamburger,
-.portrait {
+.portrait,
+.question {
   border: 0;
   background: var(--paper);
   color: var(--ink);
@@ -129,7 +130,7 @@ legend {
 input,
 select {
   width: 100%;
-  min-height: max(44px, calc(var(--ui) * 12));
+  min-height: max(40px, calc(var(--ui) * 12));
   padding: 0 calc(var(--ui) * 3);
   font: inherit;
   background: #fffaf0;
@@ -152,7 +153,7 @@ select:focus-visible,
 }
 
 .button {
-  min-height: max(44px, calc(var(--ui) * 13));
+  min-height: max(40px, calc(var(--ui) * 13));
   padding: 0 calc(var(--ui) * 5);
   font: inherit;
   font-weight: 700;
@@ -256,6 +257,11 @@ select:disabled {
   display: grid;
   place-items: center;
   background: var(--felt-dark);
+  position: relative;
+}
+
+.portrait:has(span.tag.away) {
+  opacity: 0.5;
 }
 
 .portrait.placeholder {
@@ -316,17 +322,6 @@ select:disabled {
   cursor: not-allowed;
 }
 
-/* On a phone one art pixel is tiny, so draw the picker at double size, two across. */
-@media (max-width: 480px) {
-  .avatar-grid {
-    grid-template-columns: repeat(2, auto);
-  }
-
-  .avatar-choice {
-    width: calc(var(--px) * 128 + var(--ui) * 2);
-  }
-}
-
 /* The table */
 .game {
   display: flex;
@@ -335,10 +330,8 @@ select:disabled {
   gap: calc(var(--ui) * 4);
   width: 100%;
   min-height: 100dvh;
-  /* The table is laid out for 360 art pixels across. */
-  max-width: calc(var(--px) * 360 + 16px);
   margin: 0 auto;
-  padding: calc(var(--ui) * 3) 8px calc(var(--ui) * 6);
+  padding: 6px 8px;
 }
 
 .table-wrap {
@@ -359,6 +352,7 @@ select:disabled {
 .status {
   flex: 1;
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: calc(var(--ui) * 1) calc(var(--ui) * 4);
@@ -369,15 +363,27 @@ select:disabled {
   flex: 1;
   display: grid;
   /* The side seats take what they need, the middle gets the rest. */
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-rows: auto 1fr auto;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto;
   grid-template-areas:
     "top top top"
-    "left middle right"
+    "left . right"
+    "middle middle middle"
     "bottom bottom bottom";
   align-items: center;
   justify-items: center;
   gap: calc(var(--ui) * 4);
+}
+
+@media (min-width: 473px) {
+  .table {
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "top top top"
+      "left middle right"
+      "bottom bottom bottom";
+  }
 }
 
 .seat {
@@ -399,19 +405,35 @@ select:disabled {
 
 .seat.left {
   grid-area: left;
-  justify-self: start;
 }
 
 .seat.right {
   grid-area: right;
-  justify-self: end;
 }
 
 /* Side seats are stacked: portrait over cards. */
 .seat.left,
 .seat.right {
   flex-direction: column;
-  width: calc(var(--px) * 64);
+  width: fit-content;
+}
+
+@media (min-width: 601px) {
+  .seat.left {
+    flex-direction: row;
+    justify-self: start;
+  }
+  .seat.right {
+    flex-direction: row-reverse;
+    justify-self: end;
+  }
+}
+
+@media (min-width: 640px) {
+  .seat.left,
+  .seat.right {
+    justify-self: center;
+  }
 }
 
 /* With only two players there is room to draw the other hand bigger. */
@@ -423,7 +445,6 @@ select:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: calc(var(--ui) * 1);
   width: calc(var(--px) * 64);
   text-align: center;
 }
@@ -437,10 +458,11 @@ select:disabled {
 
 .seat-meta {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   gap: 0 calc(var(--ui) * 2);
   font-size: max(14px, calc(var(--ui) * 5));
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .tag.away {
@@ -449,7 +471,7 @@ select:disabled {
 
 .seat.current .portrait {
   outline: calc(var(--ui) * 2) solid var(--gold);
-  outline-offset: calc(var(--ui) * 1);
+  outline-offset: calc(var(--ui) * -2);
 }
 
 .seat.current .seat-name {
@@ -464,16 +486,8 @@ select:disabled {
 
 .card {
   display: block;
-}
-
-.card.full {
   width: calc(var(--px) * 40 * var(--card-scale, 1));
   height: calc(var(--px) * 56 * var(--card-scale, 1));
-}
-
-.card.mini {
-  width: calc(var(--px) * 20 * var(--card-scale, 1));
-  height: calc(var(--px) * 28 * var(--card-scale, 1));
 }
 
 .piles {
@@ -518,16 +532,8 @@ select:disabled {
   top: calc(var(--px) * -1 * var(--card-scale, 1));
   pointer-events: none;
   opacity: 0.55;
-}
-
-.selection.full {
   width: calc(var(--px) * 42 * var(--card-scale, 1));
   height: calc(var(--px) * 58 * var(--card-scale, 1));
-}
-
-.selection.mini {
-  width: calc(var(--px) * 22 * var(--card-scale, 1));
-  height: calc(var(--px) * 30 * var(--card-scale, 1));
 }
 
 .card-button:hover .selection,
@@ -543,7 +549,7 @@ select:disabled {
   translate: 0 calc(var(--px) * 1 * var(--card-scale, 1));
 }
 
-/* Hamburger menu, in the top left */
+/* Hamburger menu  */
 .game-menu {
   position: relative;
   flex: none;
@@ -552,30 +558,30 @@ select:disabled {
 .hamburger {
   display: grid;
   place-items: center;
-  width: max(44px, calc(var(--ui) * 13));
-  height: 100%;
-  min-height: max(44px, calc(var(--ui) * 13));
   padding: 0;
   cursor: pointer;
   background: var(--paper-shade);
 }
 
-.hamburger:focus-visible,
-.menu-item:focus-visible,
-.close:focus-visible {
-  outline: calc(var(--ui) * 1) dashed var(--gold);
-  outline-offset: calc(var(--ui) * 2);
+.info {
+  position: fixed;
+  bottom: 8px;
+  left: 8px;
 }
 
-/* Three bars, drawn as one bar and its two shadows. */
-.bars {
-  display: block;
-  width: calc(var(--ui) * 7);
-  height: calc(var(--ui) * 1.5);
-  background: var(--ink);
-  box-shadow:
-    0 calc(var(--ui) * -3) 0 var(--ink),
-    0 calc(var(--ui) * 3) 0 var(--ink);
+.question {
+  display: flex;
+  background: var(--paper-shade);
+  padding: 0;
+  cursor: pointer;
+}
+
+.hamburger:focus-visible,
+.menu-item:focus-visible,
+.close:focus-visible,
+.question:focus-visible {
+  outline: calc(var(--ui) * 1) dashed var(--gold);
+  outline-offset: calc(var(--ui) * 2);
 }
 
 .menu {
@@ -591,7 +597,7 @@ select:disabled {
 }
 
 .menu-item {
-  min-height: max(44px, calc(var(--ui) * 12));
+  min-height: max(40px, calc(var(--ui) * 12));
   padding: 0 calc(var(--ui) * 4);
   border: 0;
   background: none;
@@ -627,10 +633,15 @@ select:disabled {
   gap: calc(var(--ui) * 4);
 }
 
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .dialog-title {
   margin: 0;
-  padding-right: calc(var(--ui) * 14);
-  font-size: calc(var(--ui) * 9);
+  font-size: calc(var(--ui) * 12);
 }
 
 .dialog-text {
@@ -638,19 +649,19 @@ select:disabled {
 }
 
 .close {
-  position: absolute;
-  top: calc(var(--ui) * 3);
-  right: calc(var(--ui) * 3);
-  width: max(44px, calc(var(--ui) * 12));
-  height: max(44px, calc(var(--ui) * 12));
+  width: max(40px, calc(var(--ui) * 12));
+  height: max(40px, calc(var(--ui) * 12));
   padding: 0;
   border: 0;
   background: var(--danger);
   color: #fff;
   font: inherit;
-  font-size: calc(var(--ui) * 8);
+  font-size: calc(var(--ui) * 10);
   font-weight: 700;
   cursor: pointer;
+  position: absolute;
+  top: 4px;
+  right: 4px;
 }
 
 .button.danger {
@@ -725,14 +736,38 @@ select:disabled {
 
 .held {
   position: absolute;
-  left: 50%;
-  bottom: calc(100% + var(--px) * 4 * var(--card-scale, 1));
-  translate: -50% 0;
+  /* translate: -50% 0; */
   z-index: 10;
   pointer-events: none;
-  filter: drop-shadow(0 calc(var(--ui) * 2) 0 rgb(0 0 0 / 0.45));
-  outline: calc(var(--ui) * 1) solid var(--gold);
-  outline-offset: calc(var(--ui) * 1);
+  filter: drop-shadow(
+    calc(var(--ui) * 2) calc(var(--ui) * 2) 0 rgb(0 0 0 / 0.45)
+  );
+}
+
+/* The card you are holding */
+.seat.bottom .held {
+  bottom: calc(100% + var(--px) * 4 * var(--card-scale, 1));
+
+  &.deck {
+    left: calc(50% - var(--px) * 67 * var(--card-scale, 1));
+  }
+
+  &.discard {
+    left: calc(50% - var(--px) * 7 * var(--card-scale, 1));
+  }
+}
+
+/* The card left or top seat is holding */
+.seat.left .held,
+.seat.top .held {
+  bottom: 25%;
+  left: calc(100% + var(--px) * 13 * var(--card-scale, 1));
+}
+
+/* The card right seat is holding */
+.seat.right .held {
+  bottom: 25%;
+  left: calc(0% - var(--px) * 53 * var(--card-scale, 1));
 }
 
 /*
@@ -743,16 +778,8 @@ select:disabled {
  *   there and covers nothing at all.
  */
 @media (max-height: 810px) {
-  .held {
-    --card-scale: 1;
-  }
-}
-
-@media (min-width: 720px) {
-  .held {
-    left: calc(100% + var(--px) * 8);
-    bottom: 0;
-    translate: none;
+  .seat.bottom .held {
+    --card-scale: 2;
   }
 }
 
@@ -812,8 +839,8 @@ select:disabled {
 /* Room chat */
 .chat {
   position: relative;
-  width: 100%;
-  flex: none;
+  width: auto;
+  flex: 1;
 }
 
 .chat-bar {
@@ -821,7 +848,7 @@ select:disabled {
   align-items: center;
   gap: calc(var(--ui) * 3);
   width: 100%;
-  min-height: max(44px, calc(var(--ui) * 12));
+  min-height: max(40px, calc(var(--ui) * 12));
   padding: 0 calc(var(--ui) * 4);
   border: 0;
   background: var(--paper);
@@ -872,14 +899,13 @@ select:disabled {
 
 /* Over the top of the page, so opening it moves nothing. */
 .chat-panel {
-  position: fixed;
-  top: calc(var(--ui) * 3);
+  position: absolute;
+  top: 0;
   left: 50%;
   z-index: 40;
   display: flex;
   flex-direction: column;
   gap: calc(var(--ui) * 3);
-  width: min(calc(var(--px) * 360), calc(100% - 16px));
   max-height: min(45dvh, 420px);
   transform: translateX(-50%);
 }
@@ -914,4 +940,10 @@ select:disabled {
 
 .chat-form .button {
   flex: none;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined Variable", sans-serif;
+  font-size: 32px;
+  padding: 1px 4px;
 }

@@ -46,7 +46,9 @@ export function Seat({
           <span className="seat-meta">
             {isDealer && <span className="tag">D</span>}
             {info !== undefined && !info.connected && (
-              <span className="tag away" aria-label="Away">...</span>
+              <span className="tag away" aria-label="Away">
+                ...
+              </span>
             )}
           </span>
         </div>

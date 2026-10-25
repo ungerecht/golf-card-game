@@ -260,7 +260,7 @@ select:disabled {
   position: relative;
 }
 
-.portrait:has(span.tag.away){
+.portrait:has(span.tag.away) {
   opacity: 0.5;
 }
 

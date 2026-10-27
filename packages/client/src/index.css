@@ -947,3 +947,48 @@ select:disabled {
   font-size: 32px;
   padding: 1px 4px;
 }
+
+/* Cards in flight. The real table never moves: cards fly across this layer. */
+.is-hidden {
+  visibility: hidden;
+}
+
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fx-card {
+  position: absolute;
+  transform-origin: 0 0;
+  perspective: 600px;
+  filter: drop-shadow(0 calc(var(--ui) * 1) 0 rgb(0 0 0 / 0.4));
+  will-change: transform;
+}
+
+.fx-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.fx-face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.fx-face.fx-only {
+  backface-visibility: visible;
+}
+
+.fx-front {
+  transform: rotateY(180deg);
+}

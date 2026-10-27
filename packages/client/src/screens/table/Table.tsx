@@ -6,6 +6,7 @@ import { Seat } from "./Seat";
 import { arrangeSeats } from "./seats";
 import { clickTargets } from "./targets";
 import { Info } from "./Info";
+import { NO_HOLD, type Hold } from "../../animation/plan";
 
 /** The whole table, as one player sees it: them at the bottom, the piles in the middle. */
 export function Table({
@@ -15,6 +16,7 @@ export function Table({
   onLeave,
   banner,
   chat,
+  hold = NO_HOLD,
 }: {
   view: GameView;
   lobby: LobbySnapshot;
@@ -26,6 +28,8 @@ export function Table({
   banner?: ReactNode;
   /** Room chat */
   chat?: ReactNode;
+  /** Places cards are still flying to. They are not drawn until the card lands. */
+  hold?: Hold;
 }) {
   const info = new Map(lobby.players.map((p) => [p.id, p]));
   const targets = clickTargets(view);
@@ -48,9 +52,10 @@ export function Table({
             view={view}
             actions={player.id === view.viewerId ? targets.slots : undefined}
             onAct={onAct}
+            hold={hold}
           />
         ))}
-        <Piles view={view} targets={targets} onAct={onAct} />
+        <Piles view={view} targets={targets} onAct={onAct} hold={hold} />
       </div>
       <Info view={view} info={info} />
     </div>

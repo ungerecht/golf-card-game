@@ -351,7 +351,7 @@ describe("starting the game", () => {
     for (const id of ["a", "b"]) {
       const { view, events } = last(inbox(id).game);
       expect(view.viewerId).toBe(id);
-      expect(events).toEqual([]);
+      expect(events).toEqual([{ type: "holeStarted", hole: 1, dealerId: "a" }]);
       expect(view).not.toHaveProperty("deck");
       const json = JSON.stringify(view);
       for (const hidden of session.game?.deck ?? []) {

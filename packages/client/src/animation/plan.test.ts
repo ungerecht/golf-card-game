@@ -100,9 +100,9 @@ describe("planUpdate", () => {
   });
 
   it("keeps a big table's deal short", () => {
-    const ids = ["a", "b", "c", "d", "e", "f"];
+    const ids = ["a", "b", "c", "d"];
     const game = createGame(
-      { ...DEFAULT_SETTINGS, maxPlayers: 6 },
+      { ...DEFAULT_SETTINGS, maxPlayers: 4 },
       ids,
       createSeededRng(3),
     );

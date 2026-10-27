@@ -11,15 +11,22 @@ export function CardButton({
   face,
   action,
   onAct,
+  anchor,
+  hidden = false,
 }: {
   face: CardFace;
   action: Action;
   onAct: (action: Action) => void;
+  /** Names this spot for the animations, which fly cards to and from it. */
+  anchor?: string;
+  /** Not drawn yet: a card is still flying here. It keeps its place. */
+  hidden?: boolean;
 }) {
   return (
     <button
       type="button"
-      className="card-button"
+      className={hidden ? "card-button is-hidden" : "card-button"}
+      data-anchor={anchor}
       aria-label={describeAction(action)}
       onClick={() => onAct(action)}
     >

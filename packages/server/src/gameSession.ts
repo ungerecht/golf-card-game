@@ -411,7 +411,14 @@ export class GameSession {
       this.#options.rng,
     );
     this.#changed();
-    this.#broadcastGame([]);
+    // Say the first hole was dealt, the same as every later hole, so the
+    // table can animate the deal. A refresh sends no events at all.
+    const dealer = this.#game.players[this.#game.dealerIndex];
+    this.#broadcastGame(
+      dealer === undefined
+        ? []
+        : [{ type: "holeStarted", hole: this.#game.hole, dealerId: dealer.id }],
+    );
     this.#afterGameChange();
   }
 

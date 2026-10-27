@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useGameAnimation } from "../animation/useGameAnimation";
 import { useLobby } from "../store/useLobby";
 import { Chat } from "./chat/Chat";
 import { errorText } from "./errors";
@@ -11,8 +12,10 @@ import { Table } from "./table/Table";
 export function GameRoom() {
   const navigate = useNavigate();
   const lobby = useLobby((s) => s.lobby);
-  const game = useLobby((s) => s.game);
-  const gameAt = useLobby((s) => s.gameAt);
+  const latest = useLobby((s) => s.game);
+  const latestAt = useLobby((s) => s.gameAt);
+  // What is on screen trails the server a little, while cards fly.
+  const { game, gameAt, hold, layerRef } = useGameAnimation(latest, latestAt);
   const error = useLobby((s) => s.error);
   const act = useLobby((s) => s.act);
   const playAgain = useLobby((s) => s.playAgain);
@@ -21,6 +24,8 @@ export function GameRoom() {
   const [closedHole, setClosedHole] = useState<number | null>(null);
 
   const leaveRoom = () => void leave().then(() => navigate("/"));
+  // Cards fly across this. It is always here, so the first deal can start.
+  const fx = <div className="fx-layer" ref={layerRef} aria-hidden="true" />;
   const errorBanner = error !== null && (
     <p className="banner" role="alert">
       {errorText(error)}
@@ -36,6 +41,7 @@ export function GameRoom() {
         </button>
         <Chat />
         {errorBanner}
+        {fx}
       </main>
     );
   }
@@ -54,6 +60,7 @@ export function GameRoom() {
         />
         <Chat />
         {errorBanner}
+        {fx}
       </main>
     );
   }
@@ -70,6 +77,7 @@ export function GameRoom() {
         onAct={act}
         onLeave={leaveRoom}
         chat={<Chat />}
+        hold={hold}
         banner={
           holeOver && summaryClosed ? (
             <ResultsBar
@@ -90,6 +98,7 @@ export function GameRoom() {
         />
       )}
       {errorBanner}
+      {fx}
     </main>
   );
 }

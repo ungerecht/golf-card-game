@@ -1,6 +1,7 @@
 import type { Action, GameView } from "@golf/shared";
 import { selectionUrl } from "../../cards";
 import { CardButton } from "./CardButton";
+import { NO_HOLD, type Hold } from "../../animation/plan";
 import { CardSprite, type CardFace } from "./CardSprite";
 import type { ClickTargets } from "./targets";
 
@@ -13,16 +14,28 @@ export function Piles({
   view,
   targets,
   onAct,
+  hold = NO_HOLD,
 }: {
   view: GameView;
   targets: ClickTargets;
   onAct: (action: Action) => void;
+  /** While cards are still flying, the piles show what they held before. */
+  hold?: Hold;
 }) {
   const source = view.phase.type === "place" ? view.phase.source : null;
 
-  const pile = (face: CardFace, action: Action | null, highlighted: boolean) =>
+  const deckCount = view.deckCount + hold.deckExtra;
+  const discardFace: CardFace =
+    hold.discard !== undefined ? hold.discard : (view.discardTop ?? "empty");
+
+  const pile = (
+    anchor: string,
+    face: CardFace,
+    action: Action | null,
+    highlighted: boolean,
+  ) =>
     action === null ? (
-      <div className="frame">
+      <div className="frame" data-anchor={anchor}>
         <CardSprite face={face} />
         {highlighted && (
           <img
@@ -35,25 +48,22 @@ export function Piles({
         )}
       </div>
     ) : (
-      <CardButton face={face} action={action} onAct={onAct} />
+      <CardButton face={face} action={action} onAct={onAct} anchor={anchor} />
     );
 
   return (
     <div className="piles" role="group" aria-label="Piles">
       <figure className="pile" data-active={source === "deck"}>
         {pile(
-          view.deckCount > 0 ? "back" : "empty",
+          "deck",
+          deckCount > 0 ? "back" : "empty",
           targets.draw,
           source === "deck",
         )}
-        <figcaption>Draw ({view.deckCount})</figcaption>
+        <figcaption>Draw ({deckCount})</figcaption>
       </figure>
       <figure className="pile" data-active={source === "discard"}>
-        {pile(
-          view.discardTop ?? "empty",
-          targets.discard,
-          source === "discard",
-        )}
+        {pile("discard", discardFace, targets.discard, source === "discard")}
         <figcaption>Discard</figcaption>
       </figure>
     </div>

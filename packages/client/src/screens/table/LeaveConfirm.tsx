@@ -1,4 +1,4 @@
-import { Dialog } from "./Dialog";
+import { Dialog } from "@/components/Dialog";
 
 /** "Are you sure?" before walking out of a game. */
 export function LeaveConfirm({

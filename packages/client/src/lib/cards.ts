@@ -1,7 +1,7 @@
 import type { Card, Rank } from "@golf/shared";
 
 // Every card image, keyed by its path.
-const sprites = import.meta.glob<string>("./assets/cards/**/*.png", {
+const sprites = import.meta.glob<string>("../assets/cards/**/*.png", {
   eager: true,
   query: "?url",
   import: "default",
@@ -25,7 +25,7 @@ export const RANK_WORDS: Record<Rank, string> = {
 };
 
 function spriteUrl(file: string): string {
-  const path = `./assets/cards/${file}.png`;
+  const path = `../assets/cards/${file}.png`;
   const url = sprites[path];
   if (url === undefined) throw new Error(`Missing card image ${path}`);
   return url;

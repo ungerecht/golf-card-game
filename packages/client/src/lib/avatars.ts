@@ -1,7 +1,7 @@
 import { AVATAR_IDS, type AvatarId } from "@golf/shared";
 
 // Every portrait in the avatars folder, keyed by its path.
-const portraits = import.meta.glob<string>("./assets/avatars/*/portrait.png", {
+const portraits = import.meta.glob<string>("../assets/avatars/*/portrait.png", {
   eager: true,
   query: "?url",
   import: "default",
@@ -9,7 +9,7 @@ const portraits = import.meta.glob<string>("./assets/avatars/*/portrait.png", {
 
 /** The portrait image for an avatar id. */
 export function avatarUrl(id: AvatarId): string {
-  const url = portraits[`./assets/avatars/${id}/portrait.png`];
+  const url = portraits[`../assets/avatars/${id}/portrait.png`];
   if (url === undefined) throw new Error(`Missing portrait for avatar "${id}"`);
   return url;
 }

@@ -5,9 +5,9 @@ import "@fontsource/unifontex";
 import "@fontsource-variable/material-symbols-outlined";
 import "./index.css";
 import { App } from "./App";
-import { allAvatarUrls } from "./avatars";
-import { allCardUrls } from "./cards";
-import { preloadImages } from "./preload";
+import { allAvatarUrls } from "./lib/avatars";
+import { allCardUrls } from "./lib/cards";
+import { preloadImages } from "./lib/preload";
 
 // Start fetching and decoding the art now, so it is already there when the
 // lobby and the table first draw it. Portraits go first: the lobby needs them.

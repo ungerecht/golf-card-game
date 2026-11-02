@@ -1,8 +1,8 @@
 import type { Action, GameView } from "@golf/shared";
-import { selectionUrl } from "@/cards";
-import { CardButton } from "./CardButton";
+import { selectionUrl } from "@/lib/cards";
+import { CardButton } from "@/components/CardButton";
 import { NO_HOLD, type Hold } from "@/animation/plan";
-import { CardSprite, type CardFace } from "./CardSprite";
+import { CardSprite, type CardFace } from "@/components/CardSprite";
 import type { ClickTargets } from "./targets";
 
 /**

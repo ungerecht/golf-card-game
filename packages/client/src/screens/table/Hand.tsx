@@ -1,7 +1,7 @@
 import type { Action, PlayerId, SlotIndex, SlotView } from "@golf/shared";
 import { anchorKey, type Hold } from "@/animation/plan";
-import { CardButton } from "./CardButton";
-import { CardSprite } from "./CardSprite";
+import { CardButton } from "@/components/CardButton";
+import { CardSprite } from "@/components/CardSprite";
 
 /** Six cards, three across and two down, as they lie on the table. */
 export function Hand({

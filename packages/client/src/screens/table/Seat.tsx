@@ -6,11 +6,11 @@ import type {
   GameView,
   DrawSource,
 } from "@golf/shared";
-import { Avatar } from "@/screens/Avatar";
-import { CardSprite } from "./CardSprite";
+import { Avatar } from "@/components/Avatar";
+import { CardSprite } from "@/components/CardSprite";
 import { Hand } from "./Hand";
 import type { SeatPosition } from "./seats";
-import { selectionUrl } from "@/cards";
+import { selectionUrl } from "@/lib/cards";
 import { NO_HOLD, anchorKey, type Hold } from "@/animation/plan";
 
 /** A player at the table: portrait, name, and their six cards. */

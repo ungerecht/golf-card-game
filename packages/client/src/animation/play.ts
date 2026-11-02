@@ -1,7 +1,7 @@
 // Draws the moves of a plan on an overlay, using the browser's own animations.
 // The real table never moves: cards fly over the top, and the place they are
 // flying to stays hidden (see Hold) until they land.
-import { cardBackUrl, cardUrl } from "@/cards";
+import { cardBackUrl, cardUrl } from "@/lib/cards";
 import type { Move } from "./plan";
 import { SHUFFLE_PASSES, SHUFFLE_PASS_MS } from "./timing";
 

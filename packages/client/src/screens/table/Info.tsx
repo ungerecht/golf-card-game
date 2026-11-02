@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { GameView, LobbyPlayer } from "@golf/shared";
-import { Dialog } from "./Dialog";
+import { Dialog } from "@/components/Dialog";
 import { statusText } from "./status";
 
 /** The info button in the bottom left corner, and everything it opens. */

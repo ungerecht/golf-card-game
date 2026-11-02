@@ -6,12 +6,12 @@ import {
   PlayerNameSchema,
   type AvatarId,
 } from "@golf/shared";
-import { AVATAR_LABELS } from "@/avatars";
+import { AVATAR_LABELS } from "@/lib/avatars";
 import { loadProfile, saveProfile } from "@/net/storage";
 import { useLobby } from "@/store/useLobby";
-import { Avatar } from "./Avatar";
+import { Avatar } from "@/components/Avatar";
 import { GameRoom } from "./GameRoom";
-import { errorText } from "./errors";
+import { errorText } from "@/lib/errors";
 import { Chat } from "./chat/Chat";
 
 export function WaitingRoom() {

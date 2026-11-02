@@ -1,8 +1,8 @@
 import type { GameUpdate, LobbySnapshot } from "@golf/shared";
-import { AVATAR_LABELS } from "@/avatars";
-import { Avatar } from "@/screens/Avatar";
+import { AVATAR_LABELS } from "@/lib/avatars";
+import { Avatar } from "@/components/Avatar";
 import { useNextHoleSeconds } from "./countdown";
-import { Dialog } from "./Dialog";
+import { Dialog } from "@/components/Dialog";
 
 function countdownText(seconds: number | null): string {
   return seconds === null ? "" : `Next hole starts in ${seconds}s`;

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Route, Routes } from "react-router";
 import { createColyseusConnector } from "./net/colyseusConnector";
 import type { Connector } from "./net/types";
-import { usePixelScale } from "./pixel";
+import { usePixelScale } from "./lib/pixel";
 import { HostSettings } from "./screens/HostSettings";
 import { Landing } from "./screens/Landing";
 import { WaitingRoom } from "./screens/WaitingRoom";

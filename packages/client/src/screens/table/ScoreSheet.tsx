@@ -1,4 +1,4 @@
-import { Dialog } from "./Dialog";
+import { Dialog } from "@/components/Dialog";
 import { ScoreTable } from "./ScoreTable";
 import type { ScoreColumn } from "./scores";
 

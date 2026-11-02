@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { DEFAULT_SETTINGS, type GameSettings } from "@golf/shared";
-import { useLobby } from "../store/useLobby";
+import { useLobby } from "@/store/useLobby";
 
 type Choice = { value: string; label: string };
 

@@ -1,5 +1,5 @@
 import type { Card } from "@golf/shared";
-import { cardBackUrl, cardLabel, cardUrl, emptySlotUrl } from "../../cards";
+import { cardBackUrl, cardLabel, cardUrl, emptySlotUrl } from "@/cards";
 
 export type CardFace = Card | "back" | "empty";
 

@@ -1,9 +1,9 @@
 import { act, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS, createGame, getPlayerView } from "@golf/shared";
-import { saveProfile } from "../net/storage";
-import { FakeConnector, gameUpdate, lobby, player } from "../test/fakes";
-import { renderApp } from "../test/render";
+import { saveProfile } from "@/net/storage";
+import { FakeConnector, gameUpdate, lobby, player } from "@/test/fakes";
+import { renderApp } from "@/test/render";
 
 /** Host a room and wait for the waiting room. */
 async function hosting(settings: Record<string, unknown> = {}) {

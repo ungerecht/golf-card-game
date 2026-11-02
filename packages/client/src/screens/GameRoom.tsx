@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useGameAnimation } from "../animation/useGameAnimation";
-import { useLobby } from "../store/useLobby";
+import { useGameAnimation } from "@/animation/useGameAnimation";
+import { useLobby } from "@/store/useLobby";
 import { Chat } from "./chat/Chat";
 import { errorText } from "./errors";
 import { GameOver } from "./table/GameOver";

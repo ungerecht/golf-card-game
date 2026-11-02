@@ -7,7 +7,7 @@ import {
   getPlayerView,
   type GameState,
 } from "@golf/shared";
-import { lobby, player } from "../../test/fakes";
+import { lobby, player } from "@/test/fakes";
 import { GameMenu } from "./GameMenu";
 
 function setup() {

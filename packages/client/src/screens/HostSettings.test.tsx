@@ -1,8 +1,8 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "@golf/shared";
-import { FakeConnector } from "../test/fakes";
-import { renderApp } from "../test/render";
+import { FakeConnector } from "@/test/fakes";
+import { renderApp } from "@/test/render";
 
 describe("room settings", () => {
   it("starts from the default settings", () => {

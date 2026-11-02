@@ -9,8 +9,8 @@ import {
   type GameState,
   type GameUpdate,
 } from "@golf/shared";
-import { gameUpdate, lobby, player } from "../test/fakes";
-import { renderApp } from "../test/render";
+import { gameUpdate, lobby, player } from "@/test/fakes";
+import { renderApp } from "@/test/render";
 
 const SETTINGS = { ...DEFAULT_SETTINGS, holes: 3 as const };
 const ROSTER = [

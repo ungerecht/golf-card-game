@@ -1,5 +1,5 @@
 import type { AvatarId } from "@golf/shared";
-import { AVATAR_LABELS, avatarUrl } from "../avatars";
+import { AVATAR_LABELS, avatarUrl } from "@/avatars";
 
 /** A portrait. The art is 64x64, drawn at a whole number of art pixels per pixel. */
 export function Avatar({ id, grey = false }: { id: AvatarId; grey?: boolean }) {

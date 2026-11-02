@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { LOBBY_CODE_LENGTH } from "@golf/shared";
 import { cleanCode } from "./cleanCode";
-import { useLobby } from "../store/useLobby";
+import { useLobby } from "@/store/useLobby";
 
 export function Landing() {
   const navigate = useNavigate();

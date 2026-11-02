@@ -1,8 +1,8 @@
 import { act, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { ChatMessage } from "@golf/shared";
-import { lobby, player } from "../../test/fakes";
-import { renderApp } from "../../test/render";
+import { lobby, player } from "@/test/fakes";
+import { renderApp } from "@/test/render";
 
 const said = (id: number, text: string, playerId = "host"): ChatMessage => ({
   id,

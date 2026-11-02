@@ -1,6 +1,6 @@
 import type { GameUpdate, LobbySnapshot } from "@golf/shared";
-import { AVATAR_LABELS } from "../../avatars";
-import { Avatar } from "../Avatar";
+import { AVATAR_LABELS } from "@/avatars";
+import { Avatar } from "@/screens/Avatar";
 import { useNextHoleSeconds } from "./countdown";
 import { Dialog } from "./Dialog";
 

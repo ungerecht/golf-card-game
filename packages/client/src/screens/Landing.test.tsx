@@ -1,7 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { FakeConnector } from "../test/fakes";
-import { renderApp } from "../test/render";
+import { FakeConnector } from "@/test/fakes";
+import { renderApp } from "@/test/render";
 import { cleanCode } from "./cleanCode";
 
 describe("cleanCode", () => {

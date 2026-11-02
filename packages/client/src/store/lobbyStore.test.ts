@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "@golf/shared";
-import { FakeConnector, lobby, player } from "../test/fakes";
-import { loadSession } from "../net/storage";
+import { FakeConnector, lobby, player } from "@/test/fakes";
+import { loadSession } from "@/net/storage";
 import { createLobbyStore } from "./lobbyStore";
 
 let connector: FakeConnector;

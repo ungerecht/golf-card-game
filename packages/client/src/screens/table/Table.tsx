@@ -6,7 +6,7 @@ import { Seat } from "./Seat";
 import { arrangeSeats } from "./seats";
 import { clickTargets } from "./targets";
 import { Info } from "./Info";
-import { NO_HOLD, type Hold } from "../../animation/plan";
+import { NO_HOLD, type Hold } from "@/animation/plan";
 
 /** The whole table, as one player sees it: them at the bottom, the piles in the middle. */
 export function Table({

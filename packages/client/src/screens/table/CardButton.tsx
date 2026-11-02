@@ -1,5 +1,5 @@
 import type { Action } from "@golf/shared";
-import { selectionUrl } from "../../cards";
+import { selectionUrl } from "@/cards";
 import { CardSprite, type CardFace } from "./CardSprite";
 import { describeAction } from "./targets";
 

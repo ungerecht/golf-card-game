@@ -6,7 +6,7 @@ import {
   getPlayerView,
   type GameState,
 } from "@golf/shared";
-import { lobby, player } from "../../test/fakes";
+import { lobby, player } from "@/test/fakes";
 import { resultColumns, scoreColumns, winnerText } from "./scores";
 
 const snapshot = lobby([

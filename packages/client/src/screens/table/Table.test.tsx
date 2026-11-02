@@ -8,7 +8,7 @@ import {
   type AvatarId,
   type GameState,
 } from "@golf/shared";
-import { lobby, player } from "../../test/fakes";
+import { lobby, player } from "@/test/fakes";
 import { Table } from "./Table";
 
 const AVATARS: AvatarId[] = ["visor", "teal", "lavender", "bucket"];

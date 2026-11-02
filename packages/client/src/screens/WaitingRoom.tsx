@@ -6,9 +6,9 @@ import {
   PlayerNameSchema,
   type AvatarId,
 } from "@golf/shared";
-import { AVATAR_LABELS } from "../avatars";
-import { loadProfile, saveProfile } from "../net/storage";
-import { useLobby } from "../store/useLobby";
+import { AVATAR_LABELS } from "@/avatars";
+import { loadProfile, saveProfile } from "@/net/storage";
+import { useLobby } from "@/store/useLobby";
 import { Avatar } from "./Avatar";
 import { GameRoom } from "./GameRoom";
 import { errorText } from "./errors";

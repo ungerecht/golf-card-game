@@ -6,12 +6,12 @@ import type {
   GameView,
   DrawSource,
 } from "@golf/shared";
-import { Avatar } from "../Avatar";
+import { Avatar } from "@/screens/Avatar";
 import { CardSprite } from "./CardSprite";
 import { Hand } from "./Hand";
 import type { SeatPosition } from "./seats";
-import { selectionUrl } from "../../cards";
-import { NO_HOLD, anchorKey, type Hold } from "../../animation/plan";
+import { selectionUrl } from "@/cards";
+import { NO_HOLD, anchorKey, type Hold } from "@/animation/plan";
 
 /** A player at the table: portrait, name, and their six cards. */
 export function Seat({

@@ -3,6 +3,7 @@ import type { GameView, LobbySnapshot } from "@golf/shared";
 import { LeaveConfirm } from "./LeaveConfirm";
 import { ScoreSheet } from "./ScoreSheet";
 import { scoreColumns } from "@/features/game/model/scores";
+import "./GameMenu.css";
 
 type Open = "none" | "menu" | "scores" | "leave";
 

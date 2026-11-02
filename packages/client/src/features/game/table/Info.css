@@ -1,0 +1,22 @@
+.info {
+  position: fixed;
+  bottom: 8px;
+  left: 8px;
+}
+
+.question {
+  display: flex;
+  background: var(--paper-shade);
+  padding: 0;
+  cursor: pointer;
+}
+
+.status {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: calc(var(--ui) * 1) calc(var(--ui) * 4);
+  margin: 0;
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { LOBBY_CODE_LENGTH } from "@golf/shared";
 import { cleanCode } from "./cleanCode";
 import { useLobby } from "@/store/useLobby";
+import "./Landing.css";
 
 export function Landing() {
   const navigate = useNavigate();

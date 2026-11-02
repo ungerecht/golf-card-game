@@ -1,4 +1,5 @@
 import { useEffect, useId, type ReactNode } from "react";
+import "./Dialog.css";
 
 /**
  * A box over the game with a red X in the corner. Escape and a click on the

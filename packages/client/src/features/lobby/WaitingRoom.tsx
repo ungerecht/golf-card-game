@@ -13,6 +13,7 @@ import { Avatar } from "@/components/Avatar";
 import { GameRoom } from "@/features/game/GameRoom";
 import { errorText } from "@/lib/errors";
 import { Chat } from "@/features/chat/Chat";
+import "./WaitingRoom.css";
 
 export function WaitingRoom() {
   const navigate = useNavigate();

@@ -1,0 +1,16 @@
+.game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 5);
+  width: 100%;
+  max-width: 480px;
+  padding-top: calc(var(--ui) * 4);
+}
+
+.winner-banner {
+  background: var(--gold);
+  text-align: center;
+  font-size: calc(var(--ui) * 9);
+  font-weight: 700;
+}

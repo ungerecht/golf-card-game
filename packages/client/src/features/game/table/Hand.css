@@ -1,0 +1,10 @@
+.hand {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: calc(var(--px) * 2 * var(--card-scale, 1));
+}
+
+/* The card you drew floats above your cards, so nothing else has to move. */
+.hand-wrap {
+  position: relative;
+}

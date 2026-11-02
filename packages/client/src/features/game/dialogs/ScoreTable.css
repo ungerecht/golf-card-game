@@ -1,0 +1,46 @@
+.score-scroll {
+  overflow-x: auto;
+}
+
+.scores {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.scores th,
+.scores td {
+  padding: calc(var(--ui) * 1.5) calc(var(--ui) * 2);
+  border-bottom: calc(var(--ui) * 0.5) solid var(--paper-shade);
+}
+
+.scores thead th {
+  vertical-align: bottom;
+}
+
+.scores tfoot th,
+.scores tfoot td {
+  border-top: calc(var(--ui) * 1) solid var(--ink);
+  border-bottom: 0;
+  font-weight: 700;
+}
+
+.score-face {
+  display: block;
+  width: calc(var(--ui) * 16);
+  height: calc(var(--ui) * 16);
+  margin: 0 auto;
+}
+
+.score-name {
+  display: block;
+  max-width: calc(var(--ui) * 30);
+  margin: 0 auto;
+  overflow-wrap: anywhere;
+  font-size: max(14px, calc(var(--ui) * 5));
+}
+
+.scores .winner {
+  background: #fbe9b7;
+  font-weight: 700;
+}

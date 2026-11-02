@@ -3,6 +3,7 @@ import { AVATAR_LABELS } from "@/lib/avatars";
 import { Avatar } from "@/components/Avatar";
 import { useNextHoleSeconds } from "@/features/game/model/countdown";
 import { Dialog } from "@/components/Dialog";
+import "./HoleSummary.css";
 
 function countdownText(seconds: number | null): string {
   return seconds === null ? "" : `Next hole starts in ${seconds}s`;

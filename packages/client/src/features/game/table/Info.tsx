@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { GameView, LobbyPlayer } from "@golf/shared";
 import { Dialog } from "@/components/Dialog";
 import { statusText } from "@/features/game/model/status";
+import "./Info.css";
 
 /** The info button in the bottom left corner, and everything it opens. */
 export function Info({

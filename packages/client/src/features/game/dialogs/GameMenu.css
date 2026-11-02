@@ -1,0 +1,41 @@
+/* Hamburger menu  */
+.game-menu {
+  position: relative;
+  flex: none;
+}
+
+.hamburger {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  background: var(--paper-shade);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--ui) * 3);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: calc(var(--ui) * 50);
+  padding: calc(var(--ui) * 1);
+}
+
+.menu-item {
+  min-height: max(40px, calc(var(--ui) * 12));
+  padding: 0 calc(var(--ui) * 4);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--paper-shade);
+}

@@ -1,0 +1,221 @@
+/* One art pixel, in CSS pixels. usePixelScale() keeps this a whole number of device pixels. */
+:root {
+  --px: 3px;
+  /* Interface sizes use this instead, so text and buttons stay usable on phones. */
+  --ui: max(var(--px), 2px);
+  /* 2 on a phone, where one art pixel is tiny. See handScale() in pixel.ts. */
+  --hand-scale: 1;
+
+  --felt: #1f5c3a;
+  --felt-dark: #174a2e;
+  --paper: #f6ecd2;
+  --paper-shade: #e2d3ad;
+  --ink: #2a2118;
+  --gold: #f0b429;
+  --gold-dark: #b9801a;
+  --danger: #b3382c;
+
+  --font: "UnifontEX", monospace;
+  font-family: var(--font);
+  color: var(--ink);
+  line-height: 1.25;
+  font-size: max(16px, calc(var(--ui) * 6));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--felt);
+  /* A faint checkered cloth */
+  background-image:
+    linear-gradient(45deg, var(--felt-dark) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--felt-dark) 25%, transparent 25%);
+  background-size: calc(var(--ui) * 8) calc(var(--ui) * 8);
+}
+
+img {
+  image-rendering: pixelated;
+}
+
+h1 {
+  margin: 0;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 6);
+  /* Never narrower than a phone screen, however small an art pixel is there. */
+  max-width: max(calc(var(--px) * 180), min(100%, 480px));
+  margin: 0 auto;
+  padding: calc(var(--ui) * 8) 16px;
+}
+
+.screen.waiting {
+  max-width: max(calc(var(--px) * 300), min(100%, 480px));
+}
+
+.title {
+  color: var(--paper);
+  font-size: calc(var(--ui) * 16);
+  text-align: center;
+  text-shadow: calc(var(--ui) * 1) calc(var(--ui) * 1) 0 var(--ink);
+}
+
+.title.small {
+  font-size: calc(var(--ui) * 11);
+}
+
+/* Boxes with notched pixel corners */
+.panel,
+.button,
+input,
+select,
+.banner,
+.avatar-choice,
+.hamburger,
+.portrait,
+.question {
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow:
+    0 calc(var(--ui) * -1) 0 0 var(--ink),
+    0 calc(var(--ui) * 1) 0 0 var(--ink),
+    calc(var(--ui) * -1) 0 0 0 var(--ink),
+    calc(var(--ui) * 1) 0 0 0 var(--ink),
+    0 calc(var(--ui) * 2) 0 0 rgb(0 0 0 / 0.3);
+}
+
+.panel {
+  width: 100%;
+  padding: calc(var(--ui) * 5);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 4);
+}
+
+.row {
+  display: flex;
+  gap: calc(var(--ui) * 4);
+  width: 100%;
+}
+
+.row > * {
+  flex: 1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 1.5);
+}
+
+.field > span,
+.label,
+legend {
+  font-weight: 700;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: max(40px, calc(var(--ui) * 12));
+  padding: 0 calc(var(--ui) * 3);
+  font: inherit;
+  background: #fffaf0;
+}
+
+input:focus-visible,
+select:focus-visible,
+.button:focus-visible,
+.avatar-choice:focus-visible,
+.link:focus-visible,
+.hamburger:focus-visible,
+.menu-item:focus-visible,
+.close:focus-visible,
+.question:focus-visible {
+  outline: calc(var(--ui) * 1) dashed var(--gold);
+  outline-offset: calc(var(--ui) * 2);
+}
+
+.button {
+  min-height: max(40px, calc(var(--ui) * 13));
+  padding: 0 calc(var(--ui) * 5);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--paper-shade);
+}
+
+.button.primary {
+  background: var(--gold);
+}
+
+.button:hover:not(:disabled) {
+  translate: 0 calc(var(--ui) * -1);
+}
+
+.button:active:not(:disabled) {
+  translate: 0 calc(var(--ui) * 1);
+}
+
+.button:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.banner {
+  width: 100%;
+  margin: 0;
+  padding: calc(var(--ui) * 3) calc(var(--ui) * 4);
+  background: #f9d9d3;
+  display: flex;
+  justify-content: space-between;
+  gap: calc(var(--ui) * 3);
+  align-items: center;
+}
+
+.link {
+  all: unset;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.hint {
+  margin: 0;
+  color: var(--paper);
+  text-align: center;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined Variable", sans-serif;
+  font-size: 32px;
+  padding: 1px 4px;
+}

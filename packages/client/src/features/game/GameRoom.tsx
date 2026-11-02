@@ -7,6 +7,8 @@ import { errorText } from "@/lib/errors";
 import { GameOver } from "./dialogs/GameOver";
 import { HoleSummary, ResultsBar } from "./dialogs/HoleSummary";
 import { Table } from "./table/Table";
+import "./GameRoom.css";
+import "./animation/fx.css";
 
 /** The game in progress, between holes, or finished. */
 export function GameRoom() {

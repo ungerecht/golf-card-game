@@ -12,6 +12,7 @@ import { Hand } from "./Hand";
 import type { SeatPosition } from "@/features/game/model/seats";
 import { selectionUrl } from "@/lib/cards";
 import { NO_HOLD, anchorKey, type Hold } from "@/features/game/animation/plan";
+import "./Seat.css";
 
 /** A player at the table: portrait, name, and their six cards. */
 export function Seat({

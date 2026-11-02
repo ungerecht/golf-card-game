@@ -1,0 +1,5 @@
+.card {
+  display: block;
+  width: calc(var(--px) * 40 * var(--card-scale, 1));
+  height: calc(var(--px) * 56 * var(--card-scale, 1));
+}

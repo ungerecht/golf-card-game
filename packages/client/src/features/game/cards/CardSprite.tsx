@@ -1,5 +1,6 @@
 import type { Card } from "@golf/shared";
 import { cardBackUrl, cardLabel, cardUrl, emptySlotUrl } from "@/lib/cards";
+import "./CardSprite.css";
 
 export type CardFace = Card | "back" | "empty";
 

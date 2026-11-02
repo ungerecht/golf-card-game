@@ -1,0 +1,136 @@
+.seat {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 4);
+  --card-scale: 1;
+  color: var(--paper);
+}
+
+.seat.bottom {
+  grid-area: bottom;
+  --card-scale: var(--hand-scale);
+}
+
+.seat.top {
+  grid-area: top;
+}
+
+.seat.left {
+  grid-area: left;
+}
+
+.seat.right {
+  grid-area: right;
+}
+
+/* Side seats are stacked: portrait over cards. */
+.seat.left,
+.seat.right {
+  flex-direction: column;
+  width: fit-content;
+}
+
+@media (min-width: 601px) {
+  .seat.left {
+    flex-direction: row;
+    justify-self: start;
+  }
+  .seat.right {
+    flex-direction: row-reverse;
+    justify-self: end;
+  }
+}
+
+@media (min-width: 640px) {
+  .seat.left,
+  .seat.right {
+    justify-self: center;
+  }
+}
+
+/* With only two players there is room to draw the other hand bigger. */
+.table[data-players="2"] .seat.top {
+  --card-scale: var(--hand-scale);
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(var(--px) * 64);
+  text-align: center;
+}
+
+.seat-name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  font-size: max(14px, calc(var(--ui) * 5));
+}
+
+.seat-meta {
+  display: flex;
+  gap: 0 calc(var(--ui) * 2);
+  font-size: max(14px, calc(var(--ui) * 5));
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.seat.current .portrait {
+  outline: calc(var(--ui) * 2) solid var(--gold);
+  outline-offset: calc(var(--ui) * -2);
+}
+
+.seat.current .seat-name {
+  color: var(--gold);
+}
+
+.held {
+  position: absolute;
+  /* translate: -50% 0; */
+  z-index: 10;
+  pointer-events: none;
+  filter: drop-shadow(
+    calc(var(--ui) * 2) calc(var(--ui) * 2) 0 rgb(0 0 0 / 0.45)
+  );
+}
+
+/* The card you are holding */
+.seat.bottom .held {
+  bottom: calc(100% + var(--px) * 4 * var(--card-scale, 1));
+
+  &.deck {
+    left: calc(50% - var(--px) * 67 * var(--card-scale, 1));
+  }
+
+  &.discard {
+    left: calc(50% - var(--px) * 7 * var(--card-scale, 1));
+  }
+}
+
+/* The card left or top seat is holding */
+.seat.left .held,
+.seat.top .held {
+  bottom: 25%;
+  left: calc(100% + var(--px) * 13 * var(--card-scale, 1));
+}
+
+/* The card right seat is holding */
+.seat.right .held {
+  bottom: 25%;
+  left: calc(0% - var(--px) * 53 * var(--card-scale, 1));
+}
+
+/*
+ * Where the drawn card floats depends on the room there is:
+ * - Short phones have no space between the piles and your cards for a big
+ *   card, so it is drawn at normal size there.
+ * - On a wide screen there is plenty of room beside your cards, so it sits
+ *   there and covers nothing at all.
+ */
+@media (max-height: 810px) {
+  .seat.bottom .held {
+    --card-scale: 2;
+  }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type FormEvent } from "react";
 import { CHAT_MESSAGE_MAX_LENGTH, type ChatMessage } from "@golf/shared";
 import { useLobby } from "@/store/useLobby";
+import "./Chat.css";
 
 /**
  * Room chat. Closed, it is one line showing the latest message. Opened, it

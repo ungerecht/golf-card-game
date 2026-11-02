@@ -4,6 +4,7 @@ import { CardButton } from "@/features/game/cards/CardButton";
 import { NO_HOLD, type Hold } from "@/features/game/animation/plan";
 import { CardSprite, type CardFace } from "@/features/game/cards/CardSprite";
 import type { ClickTargets } from "@/features/game/model/targets";
+import "./Piles.css";
 
 /**
  * The draw pile and the discard pile. While someone holds a card, the pile

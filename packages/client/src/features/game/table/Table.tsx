@@ -7,6 +7,7 @@ import { arrangeSeats } from "@/features/game/model/seats";
 import { clickTargets } from "@/features/game/model/targets";
 import { Info } from "./Info";
 import { NO_HOLD, type Hold } from "@/features/game/animation/plan";
+import "./Table.css";
 
 /** The whole table, as one player sees it: them at the bottom, the piles in the middle. */
 export function Table({

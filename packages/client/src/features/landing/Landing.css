@@ -1,0 +1,11 @@
+.code-input {
+  text-align: center;
+  letter-spacing: calc(var(--ui) * 2);
+  text-transform: uppercase;
+  font-size: calc(var(--ui) * 8);
+}
+
+.or {
+  margin: calc(var(--ui) * -2) 0;
+  color: var(--paper);
+}

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import "@fontsource/unifontex";
 import "@fontsource-variable/material-symbols-outlined";
-import "./index.css";
+import "./app/global.css";
 import { App } from "./app/App";
 import { allAvatarUrls } from "./lib/avatars";
 import { allCardUrls } from "./lib/cards";

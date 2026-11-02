@@ -7,11 +7,11 @@ import type {
   DrawSource,
 } from "@golf/shared";
 import { Avatar } from "@/components/Avatar";
-import { CardSprite } from "@/components/CardSprite";
+import { CardSprite } from "@/features/game/cards/CardSprite";
 import { Hand } from "./Hand";
-import type { SeatPosition } from "./seats";
+import type { SeatPosition } from "@/features/game/model/seats";
 import { selectionUrl } from "@/lib/cards";
-import { NO_HOLD, anchorKey, type Hold } from "@/animation/plan";
+import { NO_HOLD, anchorKey, type Hold } from "@/features/game/animation/plan";
 
 /** A player at the table: portrait, name, and their six cards. */
 export function Seat({

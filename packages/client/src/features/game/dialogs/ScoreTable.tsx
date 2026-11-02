@@ -1,4 +1,4 @@
-import type { ScoreColumn } from "./scores";
+import type { ScoreColumn } from "@/features/game/model/scores";
 
 /** A row per hole and a column per player, with a total at the bottom. */
 export function ScoreTable({

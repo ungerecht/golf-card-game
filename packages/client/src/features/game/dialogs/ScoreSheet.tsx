@@ -1,6 +1,6 @@
 import { Dialog } from "@/components/Dialog";
 import { ScoreTable } from "./ScoreTable";
-import type { ScoreColumn } from "./scores";
+import type { ScoreColumn } from "@/features/game/model/scores";
 
 /** The scores so far, in a box over the game. */
 export function ScoreSheet({

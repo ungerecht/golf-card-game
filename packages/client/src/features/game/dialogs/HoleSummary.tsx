@@ -1,7 +1,7 @@
 import type { GameUpdate, LobbySnapshot } from "@golf/shared";
 import { AVATAR_LABELS } from "@/lib/avatars";
 import { Avatar } from "@/components/Avatar";
-import { useNextHoleSeconds } from "./countdown";
+import { useNextHoleSeconds } from "@/features/game/model/countdown";
 import { Dialog } from "@/components/Dialog";
 
 function countdownText(seconds: number | null): string {

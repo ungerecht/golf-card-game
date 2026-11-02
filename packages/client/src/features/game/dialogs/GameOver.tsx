@@ -1,6 +1,6 @@
 import type { GameResult, LobbySnapshot } from "@golf/shared";
 import { ScoreTable } from "./ScoreTable";
-import { resultColumns, winnerText } from "./scores";
+import { resultColumns, winnerText } from "@/features/game/model/scores";
 
 /** The end of the game: who won, the final scores, and what to do next. */
 export function GameOver({

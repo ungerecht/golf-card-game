@@ -8,7 +8,7 @@ import type {
   PlayerId,
   SlotIndex,
 } from "@golf/shared";
-import type { CardFace } from "@/components/CardSprite";
+import type { CardFace } from "@/features/game/cards/CardSprite";
 import {
   DEAL_FLIGHT_MS,
   DEAL_STAGGER_MS,

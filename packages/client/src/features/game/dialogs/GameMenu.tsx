@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { GameView, LobbySnapshot } from "@golf/shared";
 import { LeaveConfirm } from "./LeaveConfirm";
 import { ScoreSheet } from "./ScoreSheet";
-import { scoreColumns } from "./scores";
+import { scoreColumns } from "@/features/game/model/scores";
 
 type Open = "none" | "menu" | "scores" | "leave";
 

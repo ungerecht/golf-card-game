@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import type { Action, GameView, LobbySnapshot } from "@golf/shared";
-import { GameMenu } from "./GameMenu";
+import { GameMenu } from "@/features/game/dialogs/GameMenu";
 import { Piles } from "./Piles";
 import { Seat } from "./Seat";
-import { arrangeSeats } from "./seats";
-import { clickTargets } from "./targets";
+import { arrangeSeats } from "@/features/game/model/seats";
+import { clickTargets } from "@/features/game/model/targets";
 import { Info } from "./Info";
-import { NO_HOLD, type Hold } from "@/animation/plan";
+import { NO_HOLD, type Hold } from "@/features/game/animation/plan";
 
 /** The whole table, as one player sees it: them at the bottom, the piles in the middle. */
 export function Table({

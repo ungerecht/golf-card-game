@@ -10,9 +10,9 @@ import { AVATAR_LABELS } from "@/lib/avatars";
 import { loadProfile, saveProfile } from "@/net/storage";
 import { useLobby } from "@/store/useLobby";
 import { Avatar } from "@/components/Avatar";
-import { GameRoom } from "./GameRoom";
+import { GameRoom } from "@/features/game/GameRoom";
 import { errorText } from "@/lib/errors";
-import { Chat } from "./chat/Chat";
+import { Chat } from "@/features/chat/Chat";
 
 export function WaitingRoom() {
   const navigate = useNavigate();

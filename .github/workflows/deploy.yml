@@ -1,0 +1,115 @@
+name: Deploy
+# Every push to main runs the checks, then deploys. See DEPLOY.md for the
+# one-time AWS setup. Until the AWS_ROLE_ARN variable exists, only the checks run.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  client:
+    needs: ci
+    if: vars.AWS_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Uses packages/client/.env.production for the server address.
+      - run: pnpm --filter @golf/client build
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Upload the site
+        run: |
+          output() {
+            aws cloudformation describe-stacks --stack-name GolfClient \
+              --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text
+          }
+          BUCKET=$(output BucketName)
+          DISTRIBUTION=$(output DistributionId)
+          dist=packages/client/dist
+          # File names under assets/ contain a hash of their contents, so they can be cached forever.
+          aws s3 sync "$dist/assets" "s3://$BUCKET/assets" --delete \
+            --cache-control "public,max-age=31536000,immutable"
+          # Everything else, index.html included, is checked again on every visit.
+          aws s3 sync "$dist" "s3://$BUCKET" --delete --exclude "assets/*" \
+            --cache-control "no-cache"
+          aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION" --paths "/*"
+
+  server:
+    needs: ci
+    if: vars.AWS_ROLE_ARN != ''
+    # The instance is ARM, so build on ARM instead of emulating it.
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Find the repository and the instance
+        id: aws
+        run: |
+          output() {
+            aws cloudformation describe-stacks --stack-name GolfServer \
+              --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text
+          }
+          echo "repository=$(output RepositoryUri)" >> "$GITHUB_OUTPUT"
+          echo "instance=$(output InstanceId)" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: packages/server/Dockerfile
+          push: true
+          provenance: false
+          tags: |
+            ${{ steps.aws.outputs.repository }}:${{ github.sha }}
+            ${{ steps.aws.outputs.repository }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Restart the game server on the new image
+        env:
+          INSTANCE: ${{ steps.aws.outputs.instance }}
+        run: |
+          COMMAND=$(aws ssm send-command --instance-ids "$INSTANCE" \
+            --document-name AWS-RunShellScript \
+            --parameters "commands=[\"/opt/golf/deploy.sh $GITHUB_SHA\"]" \
+            --query Command.CommandId --output text)
+          if ! aws ssm wait command-executed --command-id "$COMMAND" --instance-id "$INSTANCE"; then
+            aws ssm get-command-invocation --command-id "$COMMAND" --instance-id "$INSTANCE" \
+              --query "[StandardOutputContent,StandardErrorContent]" --output text
+            exit 1
+          fi
+      - name: Check that it answers
+        run: |
+          url="${{ vars.API_URL || 'https://api.cardgolf.party' }}/health"
+          for attempt in $(seq 1 12); do
+            if curl -fsS "$url"; then exit 0; fi
+            echo "Not up yet (attempt $attempt), waiting"
+            sleep 10
+          done
+          exit 1

@@ -33,6 +33,7 @@ export default defineConfig([
   {
     files: [
       "packages/server/**/*.ts",
+      "packages/infra/**/*.ts",
       "packages/client/vite.config.ts",
       "e2e/**/*.ts",
       "playwright.config.ts",

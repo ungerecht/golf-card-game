@@ -1,9 +1,10 @@
 name: CI
+# Runs on pull requests. Pushes to main run it through deploy.yml, so a
+# change is only deployed after it passes.
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.ref }}

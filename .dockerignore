@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+.git
+.github
+e2e
+test-results
+playwright-report
+packages/client
+packages/infra
+**/*.test.ts
+**/*.test.tsx

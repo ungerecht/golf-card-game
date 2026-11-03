@@ -11,7 +11,7 @@ import {
   type ServerMessages,
   type ServerMessageType,
 } from "@golf/shared";
-import type { Connector, RoomHandle } from "../net/types";
+import type { Connector, RoomHandle } from "@/net/types";
 
 type Handler = (message: never) => void;
 

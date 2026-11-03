@@ -1,0 +1,43 @@
+.portrait {
+  /* A portrait is 64 art pixels, always drawn at a whole number of device pixels. */
+  width: calc(var(--px) * 64);
+  height: calc(var(--px) * 64);
+  display: grid;
+  place-items: center;
+  background: var(--felt-dark);
+  position: relative;
+}
+
+.portrait:has(span.tag.away) {
+  opacity: 0.5;
+}
+
+.portrait.placeholder {
+  background: transparent;
+  box-shadow: none;
+  border: calc(var(--ui) * 1) dashed var(--paper);
+  color: var(--paper);
+  font-size: calc(var(--ui) * 16);
+}
+
+.avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar.grey {
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.6;
+}
+
+.tag {
+  padding: 0 calc(var(--ui) * 2);
+  background: var(--gold);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.tag.away {
+  background: var(--paper-shade);
+}

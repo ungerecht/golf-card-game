@@ -1,0 +1,30 @@
+/* Between holes and the end of the game */
+.hole-scores .who-cell {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ui) * 2);
+  text-align: left;
+}
+
+.hole-scores .score-name {
+  margin: 0;
+  max-width: none;
+}
+
+.score-face.small {
+  flex: none;
+  width: calc(var(--ui) * 9);
+  height: calc(var(--ui) * 9);
+  margin: 0;
+}
+
+.results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--ui) * 4);
+}
+
+.results-bar .button {
+  flex: none;
+}

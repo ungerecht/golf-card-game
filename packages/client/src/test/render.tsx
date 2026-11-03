@@ -2,8 +2,8 @@ import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { App } from "../App";
-import { createLobbyStore } from "../store/lobbyStore";
+import { App } from "@/app/App";
+import { createLobbyStore } from "@/store/lobbyStore";
 import { FakeConnector } from "./fakes";
 
 /** Show the whole app at a route, wired to a fake connector. */

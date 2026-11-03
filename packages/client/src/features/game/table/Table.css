@@ -1,0 +1,42 @@
+/* The table */
+.table-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui) * 4);
+  width: 100%;
+}
+
+.topbar {
+  display: flex;
+  align-items: stretch;
+  gap: calc(var(--ui) * 4);
+  width: 100%;
+}
+
+.table {
+  flex: 1;
+  display: grid;
+  /* The side seats take what they need, the middle gets the rest. */
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto;
+  grid-template-areas:
+    "top top top"
+    "left . right"
+    "middle middle middle"
+    "bottom bottom bottom";
+  align-items: center;
+  justify-items: center;
+  gap: calc(var(--ui) * 4);
+}
+
+@media (min-width: 473px) {
+  .table {
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "top top top"
+      "left middle right"
+      "bottom bottom bottom";
+  }
+}

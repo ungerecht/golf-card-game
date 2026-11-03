@@ -1,0 +1,73 @@
+/* Waiting room */
+.code-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 1);
+}
+
+.code {
+  font-size: calc(var(--ui) * 14);
+  letter-spacing: calc(var(--ui) * 3);
+}
+
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--ui) * 5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 2);
+  width: calc(var(--px) * 64);
+  color: var(--paper);
+  text-align: center;
+}
+
+.slot-name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.slot.empty {
+  opacity: 0.7;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: center;
+  gap: calc(var(--ui) * 4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.avatar-grid legend {
+  grid-column: 1 / -1;
+  padding: 0 0 calc(var(--ui) * 2);
+}
+
+.avatar-choice {
+  /* Same whole-pixel rule as portraits, so the picked one and the rest stay crisp. */
+  width: calc(var(--px) * 64 + var(--ui) * 2);
+  padding: calc(var(--ui) * 1);
+  cursor: pointer;
+  background: var(--felt-dark);
+}
+
+.avatar-choice[aria-pressed="true"] {
+  background: var(--gold);
+  translate: 0 calc(var(--ui) * -1);
+}
+
+.avatar-choice:disabled {
+  cursor: not-allowed;
+}

@@ -1,0 +1,24 @@
+.piles {
+  grid-area: middle;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--ui) * 4);
+  --card-scale: var(--hand-scale);
+}
+
+.pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ui) * 1);
+  margin: 0;
+  color: var(--paper);
+  font-size: max(14px, calc(var(--ui) * 5));
+  text-align: center;
+}
+
+/* The pile someone just took a card from */
+.frame {
+  position: relative;
+}

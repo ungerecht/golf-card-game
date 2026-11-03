@@ -11,9 +11,9 @@ import {
   type RoomClosedReason,
   type RoomErrorCode,
 } from "@golf/shared";
-import type { Connector, RoomHandle } from "../net/types";
+import type { Connector, RoomHandle } from "@/net/types";
 import { mergeChat } from "./chat";
-import { clearSession, loadSession, saveSession } from "../net/storage";
+import { clearSession, loadSession, saveSession } from "@/net/storage";
 
 export interface LobbyState {
   /** `connecting` covers the moment between pressing a button and being in the room. */

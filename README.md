@@ -23,7 +23,9 @@ This project is an open-source online implementation of Six Card Golf designed f
 | E2E testing | Playwright | Browser automation and full-flow validation |
 | Linting | ESLint | Code quality checks |
 | Formatting | Prettier | Consistent code style |
-| CI | GitHub Actions | Automated validation on push and pull request |
+| CI | GitHub Actions | Automated validation on pull requests, and before every deploy |
+| Hosting | AWS (S3, CloudFront, EC2), Cloudflare DNS | Static client and one game server; see [DEPLOY.md](DEPLOY.md) |
+| Infrastructure | AWS CDK | The AWS resources, written in TypeScript |
 
 ## Repository structure
 
@@ -31,7 +33,8 @@ This project is an open-source online implementation of Six Card Golf designed f
 .
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
+│       ├── ci.yml
+│       └── deploy.yml
 ├── e2e/
 ├── packages/
 │   ├── client/
@@ -39,15 +42,22 @@ This project is an open-source online implementation of Six Card Golf designed f
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── vite.config.ts
+│   ├── infra/            AWS CDK app (see DEPLOY.md)
+│   │   ├── bin/
+│   │   ├── lib/
+│   │   └── package.json
 │   ├── server/
 │   │   ├── src/
+│   │   ├── Dockerfile
 │   │   └── package.json
 │   └── shared/
 │       ├── src/
 │       └── package.json
+├── .dockerignore
 ├── .gitignore
 ├── .nvmrc
 ├── .prettierrc
+├── DEPLOY.md
 ├── eslint.config.js
 ├── LICENSE.md
 ├── package.json
@@ -95,6 +105,10 @@ pnpm test
 pnpm lint
 pnpm format:check
 ```
+
+## Deployment
+
+Every push to `main` runs the checks and deploys the client to S3 and CloudFront and the server to an EC2 instance. The one-time AWS setup and day-to-day operations are in [DEPLOY.md](DEPLOY.md).
 
 ## Future feature support
 

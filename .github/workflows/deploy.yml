@@ -34,6 +34,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Uses packages/client/.env.production for the server address.
       - run: pnpm --filter @golf/client build
+      - name: Show OIDC claims (temporary)
+        run: |
+          TOKEN=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r .value)
+          python3 -c 'import sys,base64,json;p=sys.argv[1].split(".")[1];p+="="*(-len(p)%4);d=json.loads(base64.urlsafe_b64decode(p));print({k:d.get(k) for k in ("sub","aud","repository","ref","event_name")})' "$TOKEN"
       - uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}

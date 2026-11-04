@@ -1,8 +1,9 @@
 /* Room chat */
 .chat {
   position: relative;
-  width: auto;
+  width: 100%;
   flex: 1;
+  max-width: calc(100dvw - (var(--ui) * 4) - 56px);
 }
 
 .chat-bar {

@@ -37,11 +37,13 @@ export function GameRoom() {
   if (game === null || lobby === null) {
     return (
       <main className="game">
+        <div className="topbar">
+          <Chat />
+        </div>
         <p className="panel">Dealing the cards…</p>
         <button type="button" className="button" onClick={leaveRoom}>
           Leave Room
         </button>
-        <Chat />
         {errorBanner}
         {fx}
       </main>
@@ -52,6 +54,9 @@ export function GameRoom() {
   if (view.phase.type === "gameOver" && result !== null) {
     return (
       <main className="game">
+        <div className="topbar">
+          <Chat />
+        </div>
         <GameOver
           result={result}
           lobby={lobby}
@@ -60,7 +65,6 @@ export function GameRoom() {
           onPlayAgain={playAgain}
           onLeave={leaveRoom}
         />
-        <Chat />
         {errorBanner}
         {fx}
       </main>

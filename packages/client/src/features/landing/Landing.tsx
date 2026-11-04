@@ -70,7 +70,7 @@ export function Landing() {
         disabled={busy}
         onClick={() => void navigate("/host")}
       >
-        Host
+        Host Room
       </button>
     </main>
   );

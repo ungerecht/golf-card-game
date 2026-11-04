@@ -55,7 +55,7 @@ h1 {
   /* Never narrower than a phone screen, however small an art pixel is there. */
   max-width: max(calc(var(--px) * 180), min(100%, 480px));
   margin: 0 auto;
-  padding: calc(var(--ui) * 8) 16px;
+  padding: 6px 8px;
 }
 
 .screen.waiting {
@@ -64,13 +64,13 @@ h1 {
 
 .title {
   color: var(--paper);
-  font-size: calc(var(--ui) * 16);
+  font-size: calc(var(--ui) * 24);
   text-align: center;
   text-shadow: calc(var(--ui) * 1) calc(var(--ui) * 1) 0 var(--ink);
 }
 
 .title.small {
-  font-size: calc(var(--ui) * 11);
+  font-size: calc(var(--ui) * 16);
 }
 
 /* Boxes with notched pixel corners */

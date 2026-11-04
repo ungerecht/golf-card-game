@@ -1,10 +1,22 @@
 # Golf Card Game
 
-A browser-based multiplayer Six Card Golf game built in TypeScript as a pnpm monorepo. The project is structured around a shared game engine, a React client, and a Colyseus-powered multiplayer server.
+Six Card Golf is a card game where every player lays out six cards, flips and swaps them to build the lowest score they can, and the lowest total over several holes wins. This is a free, open source way to play it in the browser with friends. One person hosts a room and shares a five-letter code, everyone picks a name and an avatar, and you play together in real time. If you don't have friends handy, fill the empty seats with bots.
 
-## Overview
+![Four players at the table, with some cards flipped and others still face down](docs/images/gameplay.png)
 
-This project is an open-source online implementation of Six Card Golf designed for play with friends. Players join a room by a host-generated lobby code, choose a name and avatar, and then play the game in a shared multiplayer session. The stack is intentionally chosen to support the immediate game flow while leaving room for future features such as room chat, bot players, and public/private lobbies.
+**[Play Game](https://cardgolf.party)** · **[How To Play](GAMERULES.md)**
+
+## Project overview
+
+A TypeScript pnpm monorepo with three main packages:
+
+| Package | What it does |
+| --- | --- |
+| [`packages/shared`](packages/shared/README.md) | The game engine and the messages between client and server. Pure code with no networking or UI. |
+| [`packages/server`](packages/server/README.md) | A Colyseus server that runs the lobby, chat, bots and the game, and decides everything. |
+| [`packages/client`](packages/client/README.md) | The React app that draws the table and sends the player's moves. |
+
+A fourth package, `packages/infra`, defines the AWS deployment. The server owns the game, and a player only ever receives the cards they are allowed to see. [ARCHITECTURE.md](ARCHITECTURE.md) explains how the pieces fit together and why.
 
 ## Detailed tech stack
 
@@ -27,49 +39,6 @@ This project is an open-source online implementation of Six Card Golf designed f
 | Hosting | AWS (S3, CloudFront, EC2), Cloudflare DNS | Static client and one game server; see [DEPLOY.md](DEPLOY.md) |
 | Infrastructure | AWS CDK | The AWS resources, written in TypeScript |
 
-## Repository structure
-
-```text
-.
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       └── deploy.yml
-├── e2e/
-├── packages/
-│   ├── client/
-│   │   ├── src/
-│   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   └── vite.config.ts
-│   ├── infra/            AWS CDK app (see DEPLOY.md)
-│   │   ├── bin/
-│   │   ├── lib/
-│   │   └── package.json
-│   ├── server/
-│   │   ├── src/
-│   │   ├── Dockerfile
-│   │   └── package.json
-│   └── shared/
-│       ├── src/
-│       └── package.json
-├── .dockerignore
-├── .gitignore
-├── .nvmrc
-├── .prettierrc
-├── DEPLOY.md
-├── eslint.config.js
-├── LICENSE.md
-├── package.json
-├── pnpm-lock.yaml
-├── pnpm-workspace.yaml
-├── playwright.config.ts
-├── tsconfig.base.json
-├── tsconfig.json
-├── PLAN.md
-└── README.md
-```
-
 ## Development workflow
 
 ### Prerequisites
@@ -89,7 +58,7 @@ pnpm install
 pnpm dev
 ```
 
-This launches the client and server packages in parallel via the root workspace script.
+This launches the client and server packages in parallel via the root workspace script. The client is at <http://localhost:5173> and the server at `ws://localhost:2567`.
 
 ### Production build
 
@@ -106,26 +75,22 @@ pnpm lint
 pnpm format:check
 ```
 
+The end-to-end test plays a whole game in two browsers. Install the browser once with `pnpm exec playwright install chromium`, then run:
+
+```bash
+pnpm test:e2e
+```
+
+CI runs all of the above on every pull request.
+
 ## Deployment
 
 Every push to `main` runs the checks and deploys the client to S3 and CloudFront and the server to an EC2 instance. The one-time AWS setup and day-to-day operations are in [DEPLOY.md](DEPLOY.md).
 
-## Future feature support
+## Roadmap
 
-| Feature | Approach |
-| --- | --- |
-| Room chat | Add a message type on the same room connection with server-side rate limiting and profanity filtering |
-| Basic animations | Drive them from client state changes with Motion; each action can be animated as it occurs |
-| Bot players | Use the same engine from a server-side function such as `chooseAction(state, playerId)` |
-| Public/private lobbies | Use Colyseus room metadata with a `private` flag and room listing support |
+- **Public and private lobbies.** The server already marks each room public or private, but the client has no way to choose one and no list of open rooms to browse yet.
 
-## Project goals
+## License
 
-- keep the game rules shared across client and server
-- use room-based multiplayer patterns for predictable state sync
-- keep the frontend focused on UI and interaction while the server owns authority
-- maintain a clean monorepo layout suitable for future expansion
-
-## Status
-
-The repository is set up as a multiplayer game architecture scaffold for Six Card Golf and is ready for implementation of the actual rules, lobby flow, server rooms, and game board UI.
+[GPL-3.0-or-later](LICENSE)

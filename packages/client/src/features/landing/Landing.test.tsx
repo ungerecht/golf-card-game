@@ -19,7 +19,7 @@ describe("landing page", () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Room code")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Join" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Host" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Host Room" })).toBeEnabled();
   });
 
   it("formats the code as it is typed and enables Join once it is complete", async () => {
@@ -77,7 +77,7 @@ describe("landing page", () => {
 
   it("goes to the room settings from Host", async () => {
     const { user } = renderApp("/");
-    await user.click(screen.getByRole("button", { name: "Host" }));
+    await user.click(screen.getByRole("button", { name: "Host Room" }));
     expect(
       screen.getByRole("heading", { name: "Room settings" }),
     ).toBeInTheDocument();

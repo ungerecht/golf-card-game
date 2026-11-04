@@ -78,6 +78,7 @@ export function WaitingRoom() {
 
   return (
     <main className="screen waiting">
+      <div className="topbar">{seated && <Chat />}</div>
       <h1 className="title small">Waiting room</h1>
 
       <section className="panel code-panel" aria-label="Room code">
@@ -168,8 +169,6 @@ export function WaitingRoom() {
       {isHost && seated && !canStart && (
         <p className="hint">Waiting for at least one more player…</p>
       )}
-
-      {seated && <Chat />}
 
       <div className="row">
         <button

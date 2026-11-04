@@ -1,9 +1,17 @@
 /* Waiting room */
+.topbar {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  gap: calc(var(--ui) * 4);
+}
+
 .code-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: calc(var(--ui) * 1);
+  width: unset;
 }
 
 .code {

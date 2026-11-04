@@ -78,9 +78,7 @@ export function WaitingRoom() {
 
   return (
     <main className="screen waiting">
-      <div className="topbar">
-        {seated && <Chat />}
-      </div>
+      <div className="topbar">{seated && <Chat />}</div>
       <h1 className="title small">Waiting room</h1>
 
       <section className="panel code-panel" aria-label="Room code">
